@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>法會報名系統管理後台</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&family=Noto+Sans+TC:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --zhu:       #8c2d19;
+  --zhu-light: #f5ede9;
+  --ink:       #1c1c1e;
+  --ink2:      #4a4845;
+  --ink3:      #8a8884;
+  --paper:     #faf9f6;
+  --paper2:    #f2f0eb;
+  --border:    rgba(140,45,25,0.18);
+  --sage:      #3B6D11;
+  --amber:     #b86800;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--paper); color: var(--ink); font-family: "Noto Sans TC", sans-serif; font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+.page { width: 100%; max-width: 640px; margin: 0 auto; padding: 0 0 3rem; }
+
+/* HEADER */
+.header { background: var(--paper); border-bottom: 2.5px solid var(--zhu); padding: 1.4rem 1.25rem 1.1rem; display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; position: sticky; top: 0; z-index: 10; }
+.title-zh  { font-family: "Noto Serif TC", serif; font-size: 1.15rem; font-weight: 700; color: var(--zhu); letter-spacing: 0.06em; }
+.title-sub { font-size: 12px; color: var(--ink3); margin-top: 4px; }
+.header-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.date-badge  { background: var(--zhu); color: #faf9f6; font-size: 12px; padding: 4px 10px; border-radius: 2px; letter-spacing: 0.06em; white-space: nowrap; }
+.btn-refresh { background: transparent; border: 0.5px solid var(--border); color: var(--ink3); font-size: 12px; padding: 4px 10px; border-radius: 2px; cursor: pointer; font-family: "Noto Sans TC", sans-serif; transition: background 0.2s; }
+.btn-refresh:hover { background: var(--paper2); }
+
+/* SECTION */
+.section { padding: 1.25rem 1.25rem 0; }
+.section-label { font-size: 12px; letter-spacing: 0.2em; color: var(--zhu); font-weight: 500; margin-bottom: 0.85rem; display: flex; align-items: center; gap: 8px; }
+.section-label::after { content: ""; flex: 1; height: 0.5px; background: var(--border); }
+
+/* KPI */
+.kpi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.kpi-card { background: var(--paper2); border: 0.5px solid var(--border); border-radius: 6px; padding: 0.9rem 1rem; position: relative; overflow: hidden; }
+.kpi-card::before { content: ""; position: absolute; top: 0; left: 0; width: 3px; height: 100%; background: var(--zhu); opacity: 0.3; }
+.kpi-card.accent::before { opacity: 1; }
+.kpi-card.full { grid-column: 1 / -1; }
+.kpi-label { font-size: 12px; color: var(--ink3); letter-spacing: 0.04em; margin-bottom: 6px; }
+.kpi-value { font-family: "Noto Serif TC", serif; font-size: 2rem; font-weight: 700; color: var(--ink); line-height: 1; }
+.kpi-card.accent .kpi-value { color: var(--zhu); }
+.kpi-unit { font-size: 14px; color: var(--ink3); margin-left: 2px; font-family: "Noto Sans TC", sans-serif; font-weight: 400; }
+
+/* 分布表 */
+.dist-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.dist-table th { font-size: 11px; letter-spacing: 0.06em; color: var(--ink3); font-weight: 400; padding: 0 6px 10px; text-align: right; border-bottom: 0.5px solid var(--border); }
+.dist-table th:first-child { text-align: left; }
+.dist-table td { padding: 11px 6px; border-bottom: 0.5px solid var(--border); color: var(--ink2); vertical-align: middle; text-align: right; }
+.dist-table td:first-child { text-align: left; font-weight: 500; color: var(--ink); }
+.dist-table tr:last-child td { border-bottom: none; }
+.n-val { font-family: "Noto Serif TC", serif; font-size: 1.1rem; font-weight: 700; color: var(--zhu); }
+
+/* 長條圖 */
+.bar-row { margin-bottom: 13px; }
+.bar-meta { display: flex; justify-content: space-between; font-size: 14px; color: var(--ink2); margin-bottom: 5px; }
+.bar-count { font-weight: 500; color: var(--ink3); font-size: 12px; }
+.bar-track { height: 6px; background: var(--paper); border-radius: 2px; overflow: hidden; border: 0.5px solid var(--border); }
+.bar-fill  { height: 100%; background: var(--zhu); border-radius: 2px; opacity: 0.7; transition: width 0.9s cubic-bezier(0.4,0,0.2,1); }
+.empty-msg { font-size: 14px; color: var(--ink3); text-align: center; padding: 14px 0; }
+
+/* 設定 */
+.settings-wrap { background: var(--paper2); border: 0.5px solid var(--border); border-radius: 6px; overflow: hidden; }
+.setting-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 16px; border-bottom: 0.5px solid var(--border); }
+.setting-row:last-of-type { border-bottom: none; }
+.setting-label { font-size: 14px; font-weight: 500; color: var(--ink); }
+.setting-desc  { font-size: 11px; color: var(--ink3); margin-top: 2px; }
+.toggle-group  { display: flex; align-items: center; gap: 8px; }
+.toggle-text   { font-size: 14px; font-weight: 500; min-width: 28px; }
+.toggle        { position: relative; width: 42px; height: 24px; flex-shrink: 0; }
+.toggle input  { opacity: 0; width: 0; height: 0; }
+.slider        { position: absolute; inset: 0; background: #d0ccc8; border-radius: 24px; cursor: pointer; transition: 0.3s; }
+.slider::before { content: ""; position: absolute; width: 18px; height: 18px; left: 3px; bottom: 3px; background: white; border-radius: 50%; transition: 0.3s; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+input:checked + .slider { background: var(--sage); }
+input:checked + .slider::before { transform: translateX(18px); }
+.field-input { padding: 7px 10px; border: 0.5px solid var(--border); border-radius: 4px; font-size: 14px; font-family: "Noto Sans TC", sans-serif; color: var(--ink); outline: none; background: white; width: 100%; }
+.field-input:focus { border-color: var(--zhu); }
+.btn-save { margin-top: 14px; width: calc(100% - 32px); margin-left: 16px; margin-right: 16px; margin-bottom: 16px; display: block; padding: 12px; background: var(--zhu); color: white; border: none; border-radius: 4px; font-size: 14px; font-family: "Noto Sans TC", sans-serif; font-weight: 500; cursor: pointer; letter-spacing: 0.06em; transition: opacity 0.2s; }
+.btn-save:hover { opacity: 0.85; }
+.btn-save:disabled { opacity: 0.5; cursor: not-allowed; }
+.save-msg { text-align: center; font-size: 12px; margin: -8px 16px 12px; min-height: 16px; }
+.save-msg.ok  { color: var(--sage); }
+.save-msg.err { color: var(--zhu); }
+
+.loading-wrap { text-align: center; padding: 3rem 0; color: var(--ink3); font-size: 14px; }
+.spinner { width: 24px; height: 24px; border: 1.5px solid var(--border); border-top-color: var(--zhu); border-radius: 50%; animation: spin 0.7s linear infinite; margin: 0 auto 10px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.footer { margin: 1.5rem 1.25rem 0; padding-top: 1rem; border-top: 0.5px solid var(--border); font-size: 11px; color: var(--ink3); letter-spacing: 0.04em; display: flex; align-items: center; gap: 6px; }
+.rel-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--sage); flex-shrink: 0; }
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <div>
+      <div class="title-zh">法會報名系統管理後台</div>
+      <div class="title-sub" id="lastUpdate">載入中⋯</div>
+    </div>
+    <div class="header-right">
+      <button class="btn-refresh" onclick="loadAll()">↺ 重新整理</button>
+      <div class="date-badge" id="todayBadge"></div>
+    </div>
+  </div>
+
+  <div id="loadingMain" class="loading-wrap">
+    <div class="spinner"></div>
+    載入資料中⋯
+  </div>
+
+  <div id="mainContent" class="hidden">
+
+    <!-- KPI -->
+    <div class="section">
+      <div class="section-label">報名總覽</div>
+      <div class="kpi-grid">
+        <div class="kpi-card accent full">
+          <div class="kpi-label">有效報名人數</div>
+          <div class="kpi-value" id="st_total">—<span class="kpi-unit">人</span></div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">義工</div>
+          <div class="kpi-value" id="st_worker">—<span class="kpi-unit">人</span></div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">信眾</div>
+          <div class="kpi-value" id="st_devotee">—<span class="kpi-unit">人</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 回山時間分布 -->
+    <div class="section" style="margin-top:1.25rem">
+      <div class="section-label">回山時間分布</div>
+      <table class="dist-table">
+        <thead>
+          <tr><th>出發時間</th><th>人數</th></tr>
+        </thead>
+        <tbody id="timeTableBody">
+          <tr><td colspan="2" style="text-align:center;color:var(--ink3);padding:16px">尚無資料</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 交通方式分布 -->
+    <div class="section" style="margin-top:1.25rem">
+      <div class="section-label">交通方式分布</div>
+      <table class="dist-table">
+        <thead>
+          <tr><th>交通方式</th><th>人數</th></tr>
+        </thead>
+        <tbody id="transportTableBody">
+          <tr><td colspan="2" style="text-align:center;color:var(--ink3);padding:16px">尚無資料</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 班別分布 -->
+    <div class="section" style="margin-top:1.25rem">
+      <div class="section-label">班別分布</div>
+      <div id="groupChart"><div class="empty-msg">尚無資料</div></div>
+    </div>
+
+    <!-- 系統設定 -->
+    <div class="section" style="margin-top:1.25rem">
+      <div class="section-label">系統設定</div>
+      <div class="settings-wrap">
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">報名系統狀態</div>
+            <div class="setting-desc">關閉後學員無法進入報名流程</div>
+          </div>
+          <div class="toggle-group">
+            <span class="toggle-text" id="toggleText">開放</span>
+            <label class="toggle">
+              <input type="checkbox" id="sysOpen" onchange="updateToggle()">
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+        <div class="setting-row">
+          <div style="flex:1">
+            <div class="setting-label">法會名稱</div>
+            <div class="setting-desc" style="margin-top:6px">
+              <input class="field-input" id="cfgEventName" placeholder="供佛齋僧法會">
+            </div>
+          </div>
+        </div>
+        <div class="setting-row">
+          <div style="flex:1">
+            <div class="setting-label">法會日期</div>
+            <div class="setting-desc" style="margin-top:6px">
+              <input class="field-input" id="cfgEventDate" placeholder="8/1（六）">
+            </div>
+          </div>
+        </div>
+        <button class="btn-save" id="btnSave" onclick="saveSettings()">儲　存　設　定</button>
+        <div class="save-msg" id="saveMsg"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer">
+    <div class="rel-dot"></div>
+    <span id="footerNote">法會報名系統　管理後台</span>
+  </div>
+
+</div>
+<script>
+const today = new Date();
+document.getElementById('todayBadge').innerText =
+  today.getFullYear() + '年' + (today.getMonth()+1) + '月' + today.getDate() + '日';
+
+function gas(funcName, ...args) {
+  return new Promise((resolve, reject) => {
+    google.script.run
+      .withSuccessHandler(resolve)
+      .withFailureHandler(reject)
+      [funcName](...args);
+  });
+}
+
+async function loadAll() {
+  document.getElementById('loadingMain').classList.remove('hidden');
+  document.getElementById('mainContent').classList.add('hidden');
+  try {
+    const stats = await gas('getStats');
+    renderStats(stats);
+    renderConfig(stats.config);
+    document.getElementById('lastUpdate').innerText = '數據更新：' + new Date().toLocaleTimeString('zh-TW');
+    document.getElementById('footerNote').innerText = '法會報名系統　有效報名 ' + stats.total + ' 人';
+    document.getElementById('loadingMain').classList.add('hidden');
+    document.getElementById('mainContent').classList.remove('hidden');
+  } catch(e) {
+    document.getElementById('loadingMain').innerHTML = '<p style="color:var(--zhu);margin-top:20px;font-size:14px">載入失敗，請重新整理</p>';
+  }
+}
+
+function renderStats(s) {
+  setHTML('st_total',   s.total + '<span class="kpi-unit">人</span>');
+  setHTML('st_worker',  (s.roleMap['義工']  || 0) + '<span class="kpi-unit">人</span>');
+  setHTML('st_devotee', (s.roleMap['信眾'] || 0) + '<span class="kpi-unit">人</span>');
+  renderDistTable('timeTableBody',      s.timeMap      || {});
+  renderDistTable('transportTableBody', s.transportMap || {});
+  renderGroupChart(s.groupMap || {}, s.total);
+}
+
+function setHTML(id, html) { document.getElementById(id).innerHTML = html; }
+
+function renderDistTable(tbodyId, map) {
+  const tbody  = document.getElementById(tbodyId);
+  const entries = Object.entries(map).sort((a,b) => b[1] - a[1]);
+  if (!entries.length) {
+    tbody.innerHTML = '<tr><td colspan="2" style="text-align:center;color:var(--ink3);padding:16px">尚無資料</td></tr>';
+    return;
+  }
+  tbody.innerHTML = entries.map(([k,v]) =>
+    `<tr><td>${k}</td><td><span class="n-val">${v}</span></td></tr>`
+  ).join('');
+}
+
+function renderGroupChart(groupMap, total) {
+  const el = document.getElementById('groupChart');
+  const entries = Object.entries(groupMap).sort((a,b) => b[1] - a[1]);
+  if (!entries.length) { el.innerHTML = '<div class="empty-msg">尚無資料</div>'; return; }
+  el.innerHTML = '';
+  entries.forEach(([key, val]) => {
+    const pct = total > 0 ? Math.round(val / total * 100) : 0;
+    const div = document.createElement('div');
+    div.className = 'bar-row';
+    div.innerHTML = `<div class="bar-meta"><span>${key}</span><span class="bar-count">${val} 人　${pct}%</span></div><div class="bar-track"><div class="bar-fill" style="width:0%"></div></div>`;
+    el.appendChild(div);
+    setTimeout(() => div.querySelector('.bar-fill').style.width = pct + '%', 80);
+  });
+}
+
+function renderConfig(cfg) {
+  if (!cfg) return;
+  document.getElementById('sysOpen').checked       = cfg.systemOpen;
+  document.getElementById('cfgEventName').value    = cfg.eventName || '';
+  document.getElementById('cfgEventDate').value    = cfg.eventDate || '';
+  updateToggle();
+}
+
+function updateToggle() {
+  const open = document.getElementById('sysOpen').checked;
+  const el   = document.getElementById('toggleText');
+  el.innerText   = open ? '開放' : '關閉';
+  el.style.color = open ? 'var(--sage)' : 'var(--zhu)';
+}
+
+async function saveSettings() {
+  const btn = document.getElementById('btnSave');
+  const msg = document.getElementById('saveMsg');
+  btn.disabled = true;
+  msg.innerText = ''; msg.className = 'save-msg';
+  try {
+    await gas('saveConfig', {
+      systemOpen : document.getElementById('sysOpen').checked,
+      eventName  : document.getElementById('cfgEventName').value.trim() || '供佛齋僧法會',
+      eventDate  : document.getElementById('cfgEventDate').value.trim()  || ''
+    });
+    msg.innerText = '✓ 設定已儲存';
+    msg.classList.add('ok');
+    setTimeout(() => { msg.innerText = ''; msg.className = 'save-msg'; }, 3000);
+  } catch(e) {
+    msg.innerText = '儲存失敗，請重試';
+    msg.classList.add('err');
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+loadAll();
+</script>
+</body>
+</html>
