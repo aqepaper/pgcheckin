@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>供佛齋僧法會報名</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700&family=Noto+Sans+TC:wght@300;400;500&display=swap');
+
+:root {
+  --ink:     #1a1a2e;
+  --gold:    #c9a84c;
+  --gold-lt: #f5e9c4;
+  --cream:   #fdf8f0;
+  --sage:    #4a7c6f;
+  --rose:    #c0392b;
+  --amber:   #e67e22;
+  --border:  #e0d5c0;
+  --shadow:  0 4px 24px rgba(26,26,46,0.09);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Noto Sans TC', sans-serif;
+  background: var(--cream);
+  min-height: 100vh;
+  padding: 28px 16px 56px;
+}
+
+.wrap { width: 100%; max-width: 440px; margin: 0 auto; }
+
+/* 頁首 */
+.header { text-align: center; margin-bottom: 26px; }
+.header-eyebrow { font-size: 10px; letter-spacing: 4px; color: var(--gold); text-transform: uppercase; margin-bottom: 8px; }
+.header h1 { font-family: 'Noto Serif TC', serif; font-size: 21px; font-weight: 700; color: var(--ink); line-height: 1.5; }
+.header-rule { width: 40px; height: 2px; background: linear-gradient(90deg, transparent, var(--gold), transparent); margin: 12px auto 0; }
+
+/* 進度條 */
+.progress { display: flex; align-items: center; margin-bottom: 24px; }
+.prog-node { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+.prog-circle { width: 30px; height: 30px; border-radius: 50%; border: 2px solid var(--border); background: white; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #bbb; transition: all 0.35s ease; position: relative; z-index: 1; }
+.prog-circle.active { border-color: var(--gold); background: var(--gold); color: white; box-shadow: 0 0 0 4px var(--gold-lt); }
+.prog-circle.done { border-color: var(--sage); background: var(--sage); color: white; }
+.prog-label { font-size: 9px; color: #bbb; letter-spacing: 0.3px; white-space: nowrap; }
+.prog-label.active { color: var(--gold); font-weight: 600; }
+.prog-line { flex: 1; height: 2px; background: var(--border); margin: 0 4px 14px; transition: background 0.35s; }
+.prog-line.done { background: var(--sage); }
+
+/* 卡片 */
+.card { background: white; border: 1px solid var(--border); border-radius: 18px; padding: 28px 22px; box-shadow: var(--shadow); animation: fadeUp 0.35s ease; }
+@keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+.card-title { font-family: 'Noto Serif TC', serif; font-size: 17px; font-weight: 700; color: var(--ink); margin-bottom: 5px; }
+.card-desc { font-size: 13px; color: #999; margin-bottom: 22px; line-height: 1.7; }
+
+/* 表單元件 */
+.field-label { display: block; font-size: 12px; font-weight: 600; color: #666; letter-spacing: 0.4px; margin-bottom: 6px; }
+.field-required { color: var(--rose); margin-left: 2px; }
+.field-input { width: 100%; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: 10px; font-size: 15px; font-family: 'Noto Sans TC', sans-serif; color: var(--ink); background: #fafafa; outline: none; margin-bottom: 18px; transition: border-color 0.2s, box-shadow 0.2s, background 0.2s; -webkit-appearance: none; }
+.field-input::placeholder { color: #ccc; letter-spacing: 2px; }
+.field-input:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,168,76,0.14); background: white; }
+
+/* 單選選項 */
+.radio-group { display: flex; flex-direction: column; gap: 10px; margin-bottom: 18px; }
+.radio-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border: 1.5px solid var(--border); border-radius: 10px; cursor: pointer; transition: border-color 0.2s, background 0.2s; background: #fafafa; }
+.radio-item:has(input:checked) { border-color: var(--gold); background: #fffbf0; }
+.radio-item input[type=radio] { width: 18px; height: 18px; accent-color: var(--gold); flex-shrink: 0; }
+.radio-item-text { font-size: 14px; color: var(--ink); font-weight: 500; }
+.radio-item-sub { font-size: 11px; color: #aaa; margin-top: 2px; }
+
+/* 按鈕 */
+.btn { width: 100%; padding: 13px; border: none; border-radius: 10px; font-size: 15px; font-family: 'Noto Sans TC', sans-serif; font-weight: 500; cursor: pointer; transition: all 0.2s; letter-spacing: 0.5px; }
+.btn-primary { background: linear-gradient(135deg, #d4a843, #a8822a); color: white; box-shadow: 0 4px 14px rgba(168,130,42,0.32); }
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(168,130,42,0.4); }
+.btn-primary:active { transform: translateY(0); }
+.btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+.btn-outline { background: transparent; color: #888; border: 1.5px solid var(--border); margin-top: 10px; }
+.btn-outline:hover { background: #f6f6f6; color: var(--ink); }
+
+/* 資訊框 */
+.info-box { background: linear-gradient(135deg,#f8f4ea,#fdf9f2); border: 1px solid var(--border); border-left: 4px solid var(--gold); border-radius: 10px; padding: 14px 16px; margin-bottom: 20px; }
+.info-row { display: flex; gap: 10px; padding: 5px 0; font-size: 14px; border-bottom: 1px solid rgba(224,213,192,0.5); }
+.info-row:last-child { border-bottom: none; }
+.info-key { color: #aaa; min-width: 72px; flex-shrink: 0; font-size: 13px; }
+.info-value { color: var(--ink); font-weight: 500; }
+
+/* 提示框 */
+.notice { border-radius: 10px; padding: 12px 14px; font-size: 13px; line-height: 1.7; margin-bottom: 16px; }
+.notice-warn { background: #fff8e6; border: 1px solid #f0d080; border-left: 4px solid #e6a817; color: #7a5800; }
+
+/* 錯誤訊息 */
+.err-msg { color: var(--rose); font-size: 12px; margin-top: -14px; margin-bottom: 14px; padding-left: 2px; }
+.err-msg:empty { display: none; }
+.field-error { border: 1.5px solid var(--rose) !important; border-radius: 10px; padding: 4px; }
+
+/* 模糊候選 */
+.fuzzy-hint { font-size: 13px; color: #999; margin-bottom: 10px; }
+.candidate { border: 1.5px solid var(--border); border-radius: 10px; padding: 12px 14px; margin-bottom: 8px; cursor: pointer; transition: all 0.2s; }
+.candidate:hover { border-color: var(--gold); background: #fffbf0; transform: translateX(4px); }
+.candidate-name { font-weight: 600; color: var(--ink); font-size: 15px; }
+.candidate-meta { font-size: 12px; color: #bbb; margin-top: 2px; }
+
+/* 分隔 */
+.section-sep { font-size: 11px; letter-spacing: 2px; color: var(--gold); font-weight: 600; margin: 20px 0 12px; padding-bottom: 6px; border-bottom: 1px solid var(--gold-lt); }
+
+/* Loading */
+.spinner-wrap { display: flex; align-items: center; gap: 10px; justify-content: center; padding: 14px 0; color: #aaa; font-size: 13px; }
+.spinner { width: 20px; height: 20px; border: 2px solid #e8e8e8; border-top-color: var(--gold); border-radius: 50%; animation: spin 0.7s linear infinite; flex-shrink: 0; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* 狀態頁面 */
+.status-center { text-align: center; padding: 8px 0 6px; }
+.status-emoji { font-size: 46px; margin-bottom: 12px; }
+.status-title { font-family: 'Noto Serif TC', serif; font-size: 19px; font-weight: 700; margin-bottom: 8px; }
+.status-body { font-size: 14px; color: #888; line-height: 1.8; }
+.color-sage  { color: var(--sage); }
+.color-amber { color: var(--amber); }
+.color-gray  { color: #666; }
+
+.hidden { display: none !important; }
+hr.divider { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- 頁首 -->
+  <div class="header">
+    <div class="header-eyebrow">Online Registration</div>
+    <h1 id="headerTitle">供佛齋僧法會報名</h1>
+    <div class="header-rule"></div>
+  </div>
+
+  <!-- 進度條 -->
+  <div class="progress">
+    <div class="prog-node">
+      <div class="prog-circle active" id="pc1">1</div>
+      <div class="prog-label active"  id="pl1">查詢</div>
+    </div>
+    <div class="prog-line" id="pln1"></div>
+    <div class="prog-node">
+      <div class="prog-circle" id="pc2">2</div>
+      <div class="prog-label"  id="pl2">確認</div>
+    </div>
+    <div class="prog-line" id="pln2"></div>
+    <div class="prog-node">
+      <div class="prog-circle" id="pc3">3</div>
+      <div class="prog-label"  id="pl3">填寫</div>
+    </div>
+    <div class="prog-line" id="pln3"></div>
+    <div class="prog-node">
+      <div class="prog-circle" id="pc4">4</div>
+      <div class="prog-label"  id="pl4">完成</div>
+    </div>
+  </div>
+
+  <!-- ══ 步驟1：查詢 ══ -->
+  <div class="card" id="step1">
+    <div class="card-title" style="text-align:center">🔍 身份驗證</div>
+    <div class="card-desc" style="text-align:center">請輸入姓名或學員編號</div>
+    <input class="field-input" id="queryInput" type="text"
+      placeholder="姓名或學員編號"
+      maxlength="30"
+      style="font-size:20px;color:#1a1a2e;text-align:center;font-weight:500"
+      onkeydown="if(event.key==='Enter')doLookup()">
+    <div class="err-msg" id="err1"></div>
+    <div class="spinner-wrap hidden" id="spin1">
+      <div class="spinner"></div>查詢中，請稍候⋯
+    </div>
+    <button class="btn btn-primary" id="btnLookup" onclick="doLookup()">查　詢　→</button>
+  </div>
+
+  <!-- ══ 步驟1b：模糊候選 ══ -->
+  <div class="card hidden" id="stepFuzzy">
+    <div class="card-title">🔎 您是指這位嗎？</div>
+    <div class="fuzzy-hint">找不到完全符合的結果，請點選確認：</div>
+    <div id="candidateList"></div>
+    <hr class="divider">
+    <button class="btn btn-outline" onclick="backToStep1()">← 重新輸入</button>
+  </div>
+
+  <!-- ══ 步驟2：確認身份 ══ -->
+  <div class="card hidden" id="step2">
+    <div class="card-title">👤 確認您的資料</div>
+    <div class="card-desc">請確認以下是您本人的資料</div>
+    <div class="info-box">
+      <div class="info-row"><span class="info-key">學員編號</span><span class="info-value" id="s_id"></span></div>
+      <div class="info-row"><span class="info-key">姓名</span><span class="info-value" id="s_name"></span></div>
+      <div class="info-row"><span class="info-key">法名</span><span class="info-value" id="s_dharma"></span></div>
+      <div class="info-row"><span class="info-key">班組別</span><span class="info-value" id="s_group"></span></div>
+      <div class="info-row"><span class="info-key">電話</span><span class="info-value" id="s_phone"></span></div>
+    </div>
+    <button class="btn btn-primary" onclick="goStep3()">✅ 是本人，繼續報名</button>
+    <button class="btn btn-outline"  onclick="backToStep1()">❌ 不是我，重新輸入</button>
+  </div>
+
+  <!-- ══ 步驟3：填寫報名資料 ══ -->
+  <div class="card hidden" id="step3">
+    <div class="card-title">📋 填寫報名資料</div>
+    <div class="info-box" style="margin-bottom:16px">
+      <div class="info-row"><span class="info-key">姓名</span><span class="info-value" id="s3_name"></span></div>
+      <div class="info-row"><span class="info-key">法名</span><span class="info-value" id="s3_dharma"></span></div>
+      <div class="info-row"><span class="info-key">班別</span><span class="info-value" id="s3_group"></span></div>
+    </div>
+
+    <!-- 法會身份 -->
+    <div class="section-sep">法會身份</div>
+    <div class="radio-group" id="roleGroup">
+      <label class="radio-item">
+        <input type="radio" name="role" value="義工">
+        <div>
+          <div class="radio-item-text">義工</div>
+          <div class="radio-item-sub">統一 7/31 晚上 18:30 出發</div>
+        </div>
+      </label>
+      <label class="radio-item">
+        <input type="radio" name="role" value="信眾">
+        <div>
+          <div class="radio-item-text">信眾</div>
+        </div>
+      </label>
+    </div>
+
+    <!-- 回山時間（信眾才顯示） -->
+    <div id="depTimeWrap">
+      <div class="section-sep">回山時間</div>
+      <div class="radio-group" id="depTimeGroup">
+        <label class="radio-item">
+          <input type="radio" name="depTime" value="7/31 晚上 18:30">
+          <div>
+            <div class="radio-item-text">7/31（四）晚上 18:30 出發</div>
+          </div>
+        </label>
+        <label class="radio-item">
+          <input type="radio" name="depTime" value="8/1 早上 05:00">
+          <div>
+            <div class="radio-item-text">8/1（五）早上 05:00 出發</div>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <!-- 交通方式 -->
+    <div class="section-sep">交通方式<span style="color:var(--rose);margin-left:4px;">*</span></div>
+    <div style="font-size:12px;color:#aaa;margin:-6px 0 12px;line-height:1.6;">自行者請於備註欄中填寫小車車號或交通方式</div>
+    <div class="radio-group" id="transportGroup">
+      <label class="radio-item">
+        <input type="radio" name="transport" value="去回精舍大車">
+        <div><div class="radio-item-text">去回精舍大車</div></div>
+      </label>
+      <label class="radio-item">
+        <input type="radio" name="transport" value="去回自行">
+        <div><div class="radio-item-text">去回自行</div></div>
+      </label>
+      <label class="radio-item">
+        <input type="radio" name="transport" value="去程自行，回程精舍大車">
+        <div><div class="radio-item-text">去程自行，回程精舍大車</div></div>
+      </label>
+      <label class="radio-item">
+        <input type="radio" name="transport" value="去程精舍大車，回程自行">
+        <div><div class="radio-item-text">去程精舍大車，回程自行</div></div>
+      </label>
+    </div>
+
+    <!-- 備註 -->
+    <label class="field-label" style="margin-top:4px">備註（選填）</label>
+    <input class="field-input" id="note" type="text" placeholder="自行或搭小車者請填車號，或其他說明">
+
+    <div class="err-msg" id="err3"></div>
+    <div class="spinner-wrap hidden" id="spin3">
+      <div class="spinner"></div>送出中，請稍候⋯
+    </div>
+    <button class="btn btn-primary" id="btnSubmit" onclick="doSubmit()">送出報名　✓</button>
+  </div>
+
+  <!-- ══ 已報名提示 ══ -->
+  <div class="card hidden" id="stepDup">
+    <div class="status-center">
+      <div class="status-emoji">⚠️</div>
+      <div class="status-title color-amber">您已完成報名</div>
+    </div>
+    <div class="info-box" style="margin-top:16px">
+      <div class="info-row"><span class="info-key">姓名</span><span class="info-value" id="dup_name"></span></div>
+      <div class="info-row"><span class="info-key">法名</span><span class="info-value" id="dup_dharma"></span></div>
+      <div class="info-row"><span class="info-key">班組別</span><span class="info-value" id="dup_group"></span></div>
+      <div class="info-row"><span class="info-key">法會身份</span><span class="info-value" id="dup_role"></span></div>
+      <div class="info-row"><span class="info-key">回山時間</span><span class="info-value" id="dup_time"></span></div>
+      <div class="info-row"><span class="info-key">交通方式</span><span class="info-value" id="dup_transport"></span></div>
+      <div class="info-row"><span class="info-key">報名日期</span><span class="info-value" id="dup_regAt"></span></div>
+    </div>
+    <div class="status-body" style="text-align:center">
+      如資料正確無需修改，直接關閉頁面即可。<br>
+      如需修改，請按「修改報名」。
+    </div>
+    <button class="btn btn-primary" style="margin-top:18px" onclick="reRegister()">修改報名</button>
+    <button class="btn btn-outline"  style="margin-top:10px" onclick="backToStep1()">資料正確，不需修改</button>
+  </div>
+
+  <!-- ══ 系統關閉 ══ -->
+  <div class="card hidden" id="stepClosed">
+    <div class="status-center">
+      <div class="status-emoji">🔒</div>
+      <div class="status-title color-gray">報名系統暫停開放</div>
+      <div class="status-body" style="margin-top:8px">
+        目前報名系統尚未開放或已截止，<br>請聯絡主辦單位取得更多資訊。
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ 完成 ══ -->
+  <div class="card hidden" id="step4">
+    <div class="status-center">
+      <div class="status-emoji">🎉</div>
+      <div class="status-title color-sage">報名成功！</div>
+      <div class="status-body" id="successMsg" style="margin-top:10px;white-space:pre-line"></div>
+      <div class="status-body" style="margin-top:6px">以最後一次送出為準。</div>
+    </div>
+    <button class="btn btn-outline" style="margin-top:22px" onclick="resetAll()">← 返回報名首頁</button>
+  </div>
+
+</div>
+
+<script>
+let member = {};
+
+// 進度條
+function setProgress(active) {
+  for (let i = 1; i <= 4; i++) {
+    const c = document.getElementById('pc' + i);
+    const l = document.getElementById('pl' + i);
+    c.classList.remove('active','done');
+    l.classList.remove('active');
+    if      (i < active)  { c.classList.add('done');   c.innerHTML = '✓'; }
+    else if (i === active) { c.classList.add('active'); c.innerHTML = i; l.classList.add('active'); }
+    else                  { c.innerHTML = i; }
+    if (i < 4) document.getElementById('pln' + i).classList.toggle('done', i < active);
+  }
+}
+
+// 畫面切換
+const STEPS = ['step1','stepFuzzy','step2','step3','step4','stepDup','stepClosed'];
+function show(id) {
+  STEPS.forEach(s => document.getElementById(s).classList.add('hidden'));
+  document.getElementById(id).classList.remove('hidden');
+}
+
+function backToStep1() {
+  document.getElementById('queryInput').value = '';
+  document.getElementById('err1').innerText   = '';
+  show('step1'); setProgress(1);
+}
+
+// 步驟1：查詢
+async function doLookup() {
+  const q = document.getElementById('queryInput').value.trim();
+  document.getElementById('err1').innerText = '';
+  if (!q) { document.getElementById('err1').innerText = '請輸入姓名或學員編號'; return; }
+
+  setLoading('spin1', 'btnLookup', true);
+  try {
+    const r = await gas('lookupMember', q);
+    handleLookupResult(r);
+  } catch(e) {
+    document.getElementById('err1').innerText = '查詢失敗，請稍後再試';
+  } finally {
+    setLoading('spin1', 'btnLookup', false);
+  }
+}
+
+function handleLookupResult(r) {
+  if (!r)               { document.getElementById('err1').innerText = '查詢回傳空值'; return; }
+  if (r.systemClosed)   { show('stepClosed'); setProgress(1); return; }
+  if (!r.found && r.fuzzy) { renderCandidates(r.candidates); show('stepFuzzy'); setProgress(1); return; }
+  if (!r.found)         { document.getElementById('err1').innerText = '查無此姓名或學員編號，請確認後重試'; return; }
+  if (r.duplicate)      { showDuplicate(r); return; }
+  fillStep2(r);
+}
+
+// 模糊候選
+function renderCandidates(candidates) {
+  const wrap = document.getElementById('candidateList');
+  wrap.innerHTML = '';
+  (candidates || []).forEach(c => {
+    const div = document.createElement('div');
+    div.className = 'candidate';
+    div.innerHTML = `<div class="candidate-name">${c.name}　<span style="color:#888;font-size:13px">${c.dharmaName||''}</span></div><div class="candidate-meta">班組別：${c.group}　學員編號：${c.studentId}</div>`;
+    div.onclick = () => selectCandidate(c);
+    wrap.appendChild(div);
+  });
+}
+
+async function selectCandidate(c) {
+  try {
+    const r = await gas('confirmFuzzyMember', c);
+    if (r.duplicate) { showDuplicate(r); return; }
+    fillStep2(r);
+  } catch(e) { document.getElementById('err1').innerText = '確認失敗，請重試'; }
+}
+
+// 步驟2：確認身份
+function fillStep2(r) {
+  member = r;
+  document.getElementById('s_id').innerText     = r.studentId;
+  document.getElementById('s_name').innerText   = r.name;
+  document.getElementById('s_dharma').innerText = r.dharmaName || '—';
+  document.getElementById('s_group').innerText  = r.group;
+  document.getElementById('s_phone').innerText  = r.phoneMasked || r.phone;
+  show('step2'); setProgress(2);
+}
+
+function goStep3() {
+  document.getElementById('s3_name').innerText   = member.name || '';
+  document.getElementById('s3_dharma').innerText = member.dharmaName || '—';
+  document.getElementById('s3_group').innerText  = member.group || '';
+
+  // 義工強制 7/31 出發，隱藏回山時間選擇
+  document.querySelectorAll('input[name=role]').forEach(r => r.checked = false);
+  document.querySelectorAll('input[name=depTime]').forEach(r => r.checked = false);
+  document.querySelectorAll('input[name=transport]').forEach(r => r.checked = false);
+  document.getElementById('note').value    = '';
+  document.getElementById('err3').innerText = '';
+
+  // 若是修改報名，預填上次資料
+  if (member.override) {
+    setRadio('role',      member.prevRole);
+    setRadio('depTime',   member.prevTime);
+    setRadio('transport', member.prevTransport);
+  }
+
+  // 監聽義工/信眾切換
+  document.querySelectorAll('input[name=role]').forEach(r => r.addEventListener('change', onRoleChange));
+  document.querySelectorAll('input[name=transport]').forEach(r => r.addEventListener('change', () => document.getElementById('transportGroup').classList.remove('field-error')));
+  onRoleChange();
+
+  show('step3'); setProgress(3);
+}
+
+function setRadio(name, val) {
+  const el = document.querySelector(`input[name="${name}"][value="${val}"]`);
+  if (el) el.checked = true;
+}
+
+function onRoleChange() {
+  const role = getRadioVal('role');
+  const wrap = document.getElementById('depTimeWrap');
+  if (role === '義工') {
+    wrap.classList.add('hidden');
+  } else {
+    wrap.classList.remove('hidden');
+  }
+}
+
+// 已報名
+function showDuplicate(r) {
+  member = r;
+  document.getElementById('dup_name').innerText      = r.name || '';
+  document.getElementById('dup_dharma').innerText    = r.dharmaName || '—';
+  document.getElementById('dup_group').innerText     = r.group || '';
+  document.getElementById('dup_role').innerText      = r.prevRole || '—';
+  document.getElementById('dup_time').innerText      = r.prevTime || '—';
+  document.getElementById('dup_transport').innerText = r.prevTransport || '—';
+  document.getElementById('dup_regAt').innerText     = r.registeredAt || '';
+  show('stepDup'); setProgress(2);
+}
+
+function reRegister() {
+  member.override = true;
+  goStep3();
+}
+
+// 步驟3：送出
+async function doSubmit() {
+  document.getElementById('err3').innerText = '';
+
+  const role      = getRadioVal('role');
+  const transport = getRadioVal('transport');
+  const note      = document.getElementById('note').value.trim();
+
+  // 義工固定出發時間
+  let depTime = getRadioVal('depTime');
+  if (role === '義工') depTime = '7/31 晚上 18:30';
+
+  if (!role)      { showErr('err3', '請選擇法會身份'); return; }
+  if (!depTime)   { showErr('err3', '請選擇回山時間'); return; }
+  if (!transport) { showErr('err3', '請選擇交通方式'); document.getElementById('transportGroup').classList.add('field-error'); return; }
+  document.getElementById('transportGroup').classList.remove('field-error');
+
+  setLoading('spin3', 'btnSubmit', true);
+
+  const data = {
+    studentId  : member.studentId  || '',
+    name       : member.name       || '',
+    dharmaName : member.dharmaName || '',
+    gender     : member.gender     || '',
+    phone      : String(member.phone || '').replace(/[^0-9]/g, ''),
+    group      : member.group      || '',
+    role, depTime, transport, note
+  };
+
+  try {
+    const r = await gas('submitRegistration', data);
+    if (r.success) {
+      document.getElementById('successMsg').innerText =
+        `${member.name}　${member.dharmaName||''}\n身份：${role}\n出發時間：${depTime}\n交通：${transport}`;
+      show('step4'); setProgress(4);
+    } else {
+      showErr('err3', '送出失敗（' + (r.reason||'unknown') + '），請重試');
+    }
+  } catch(e) {
+    showErr('err3', '送出失敗，請稍後再試');
+  } finally {
+    setLoading('spin3', 'btnSubmit', false);
+  }
+}
+
+// 工具函式
+function getRadioVal(name) {
+  const el = document.querySelector(`input[name="${name}"]:checked`);
+  return el ? el.value : '';
+}
+function showErr(id, msg) {
+  const el = document.getElementById(id);
+  if (el) el.innerText = msg || '';
+}
+function setLoading(spinId, btnId, on) {
+  document.getElementById(spinId).classList.toggle('hidden', !on);
+  if (btnId) document.getElementById(btnId).disabled = on;
+}
+function gas(funcName, ...args) {
+  return new Promise((resolve, reject) => {
+    google.script.run
+      .withSuccessHandler(resolve)
+      .withFailureHandler(reject)
+      [funcName](...args);
+  });
+}
+
+function resetAll() {
+  member = {};
+  document.getElementById('queryInput').value = '';
+  document.getElementById('err1').innerText   = '';
+  show('step1'); setProgress(1);
+}
+</script>
+</body>
+</html>
