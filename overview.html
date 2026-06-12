@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>大型活動報名系統說明</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700;900&family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#111122; --gold:#aa7a00; --gold-light:#d4a017; --gold-pale:#fbf7ee; --gold-border:#dfbe40;
+    --maroon:#801818; --cream:#f7f4ed; --green:#0f522e; --green-pale:#eaf5ed; --green-border:#a3d9b9;
+    --gray:#888; --gray-pale:#f0f0f0; --gray-border:#ddd;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{font-size:18px;-webkit-text-size-adjust:100%}
+  body{
+    font-family:'Noto Sans TC',sans-serif; background:var(--cream); color:var(--ink);
+    min-height:100vh; max-width:480px; margin:0 auto;
+    box-shadow:0 0 40px rgba(0,0,0,0.12); line-height:1.7; padding-bottom:50px;
+  }
+  header{
+    background:#fdf8f0; padding:26px 20px 22px; text-align:center;
+    border-bottom:2px solid #e8d9c0; position:relative;
+  }
+  header .icon{font-size:2.2rem; line-height:1}
+  header h1{
+    font-family:'Noto Serif TC',serif; font-size:1.35rem; font-weight:900;
+    color:var(--maroon); margin-top:8px; letter-spacing:.04em;
+  }
+  header .sub{font-size:.85rem; color:#a8916c; font-weight:700; margin-top:4px}
+
+  #main{padding:18px 16px}
+
+  .module{
+    background:#fdf9f3; border:2px solid #ede0cc; border-radius:18px;
+    margin-bottom:16px; overflow:hidden;
+    box-shadow:0 4px 12px rgba(90,64,32,0.06);
+  }
+  .module.pending{ border-color:#e0d8d8; background:#fafafa; }
+  .module-head{
+    display:flex; align-items:center; gap:12px; padding:16px 16px 14px;
+    border-bottom:2px dashed #efe2cc;
+  }
+  .module.pending .module-head{ border-bottom-color:#e2e2e2; }
+  .m-num{
+    font-family:'Noto Serif TC',serif; font-weight:900; font-size:1.3rem;
+    color:#fff; background:var(--maroon); width:42px; height:42px; flex:none;
+    border-radius:50%; display:flex; align-items:center; justify-content:center;
+  }
+  .module.pending .m-num{ background:var(--gray); }
+  .m-title-wrap{flex:1; min-width:0}
+  .m-title{font-family:'Noto Serif TC',serif; font-size:1.12rem; font-weight:900; color:var(--maroon)}
+  .module.pending .m-title{color:#777}
+  .m-status{
+    display:inline-block; font-size:.78rem; font-weight:900; padding:3px 12px;
+    border-radius:20px; margin-top:4px;
+  }
+  .st-done{background:var(--green-pale); color:var(--green); border:1px solid var(--green-border)}
+  .st-pending{background:var(--gray-pale); color:#888; border:1px solid var(--gray-border)}
+
+  .module-body{padding:14px 16px 18px}
+  .m-desc{font-size:.96rem; color:#4a3a28}
+  .m-desc b{color:var(--maroon)}
+  .module.pending .m-desc b{color:#777}
+
+  .feature-list{margin-top:10px; padding-left:0; list-style:none}
+  .feature-list li{
+    font-size:.9rem; color:#5a4a38; padding-left:22px; position:relative; margin-bottom:6px;
+  }
+  .feature-list li::before{
+    content:"◆"; position:absolute; left:0; color:var(--gold); font-size:.7rem; top:5px;
+  }
+  .module.pending .feature-list li{color:#999}
+  .module.pending .feature-list li::before{color:#bbb}
+
+  .data-chip{
+    display:inline-flex; align-items:center; gap:4px; font-size:.78rem; font-weight:700;
+    background:var(--gold-pale); color:#8a6510; border:1px solid var(--gold-border);
+    padding:3px 10px; border-radius:20px; margin:2px 4px 0 0;
+  }
+
+  /* 流程圖 */
+  .flow{
+    margin:22px 0; background:#fffaf2; border:2px solid var(--gold-border);
+    border-radius:16px; padding:18px 14px;
+  }
+  .flow-title{
+    font-family:'Noto Serif TC',serif; font-weight:900; color:var(--maroon);
+    font-size:1.05rem; text-align:center; margin-bottom:14px;
+  }
+  .flow-steps{display:flex; flex-direction:column; gap:0}
+  .flow-step{
+    display:flex; align-items:center; gap:12px; padding:8px 0;
+  }
+  .flow-dot{
+    width:34px; height:34px; border-radius:50%; flex:none;
+    display:flex; align-items:center; justify-content:center;
+    font-weight:900; font-size:.95rem; color:#fff; background:var(--green);
+    font-family:'Noto Serif TC',serif;
+  }
+  .flow-step.pending .flow-dot{background:var(--gray)}
+  .flow-label{font-size:.95rem; font-weight:700; color:#4a3a28}
+  .flow-step.pending .flow-label{color:#999}
+  .flow-arrow{
+    text-align:center; color:#cbb98a; font-size:1rem; margin:-2px 0 -2px 17px; line-height:1;
+  }
+
+  /* 資料流卡片 */
+  .core{
+    margin-top:22px; background:#fff; border:2px solid var(--gold-border); border-radius:16px;
+    padding:18px 16px; text-align:center;
+  }
+  .core-title{font-family:'Noto Serif TC',serif; font-weight:900; color:var(--maroon); font-size:1.05rem}
+  .core-name{
+    display:inline-block; margin-top:10px; font-family:'Noto Serif TC',serif; font-weight:900;
+    font-size:1.15rem; color:#fff; background:var(--maroon); padding:8px 22px; border-radius:30px;
+    letter-spacing:.05em;
+  }
+  .core-desc{font-size:.88rem; color:#8a7050; margin-top:10px}
+
+  .legend{
+    display:flex; justify-content:center; gap:18px; margin-top:18px; font-size:.85rem;
+  }
+  .legend span{display:flex; align-items:center; gap:6px; font-weight:700; color:#5a4a38}
+  .legend .dot{width:14px; height:14px; border-radius:50%}
+  .dot-done{background:var(--green)}
+  .dot-pending{background:var(--gray)}
+
+  footer{text-align:center; padding:24px 0 10px; color:#bbb; font-size:.7rem}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="icon">☸</div>
+  <h1>大型活動報名系統說明</h1>
+  <div class="sub">普高精舍・活動數位化作業五階段</div>
+</header>
+
+<div id="main">
+
+  <!-- 階段1 -->
+  <div class="module">
+    <div class="module-head">
+      <div class="m-num">1</div>
+      <div class="m-title-wrap">
+        <div class="m-title">報名</div>
+        <span class="m-status st-done">✅ 已完成</span>
+      </div>
+    </div>
+    <div class="module-body">
+      <div class="m-desc">
+        學員線上完成<b>報名、修改、取消</b>，資料即時寫入後台名單，作為派車分組的資料來源。
+      </div>
+      <ul class="feature-list">
+        <li>報名：填寫基本資料、選擇場次與身分（義工／信眾）</li>
+        <li>修改：本人可自行更新聯絡資料、同車需求等</li>
+        <li>取消：報名後可自行取消，名額即時釋出</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 階段2 -->
+  <div class="module">
+    <div class="module-head">
+      <div class="m-num">2</div>
+      <div class="m-title-wrap">
+        <div class="m-title">DVSS 派車</div>
+        <span class="m-status st-done">✅ 已完成</span>
+      </div>
+    </div>
+    <div class="module-body">
+      <div class="m-desc">
+        依照<b>報名名單</b>，自動完成派車並產生各車<b>名單分頁</b>（A1～C3 等）。
+        依同車需求、性別、班組別配對，產生「異常清單」供人工確認配對失敗者。
+      </div>
+      <div style="margin-top:10px"><span class="data-chip">📥 來源：報名名單</span><span class="data-chip">📤 產出：各車派車分頁</span></div>
+    </div>
+  </div>
+
+  <!-- 階段3 -->
+  <div class="module">
+    <div class="module-head">
+      <div class="m-num">3</div>
+      <div class="m-title-wrap">
+        <div class="m-title">建立出車表名單</div>
+        <span class="m-status st-done">✅ 已完成</span>
+      </div>
+    </div>
+    <div class="module-body">
+      <div class="m-desc">
+        派車定稿後，領隊／副領隊登入查看本車名單並提出<b>線上異動申請</b>
+        （取消報名、改自行、改大車、申請同車等）；管理者審核並一鍵執行，
+        依異動結果<b>產出正式出車表</b>，自動更新名單、重編序號與人數統計。
+      </div>
+      <ul class="feature-list">
+        <li>領隊／副領隊登入查看本車名單、提出異動申請</li>
+        <li>管理者審核：核准並自動執行（移車／轉自行／刪除）</li>
+        <li>異動後自動重編序號、更新車次人數統計</li>
+      </ul>
+      <div style="margin-top:10px"><span class="data-chip">📥 來源：派車分頁＋異動申請</span><span class="data-chip">📤 產出：正式出車表</span></div>
+    </div>
+  </div>
+
+  <!-- 階段4 -->
+  <div class="module">
+    <div class="module-head">
+      <div class="m-num">4</div>
+      <div class="m-title-wrap">
+        <div class="m-title">車隊資訊看板</div>
+        <span class="m-status st-done">✅ 已完成</span>
+      </div>
+    </div>
+    <div class="module-body">
+      <div class="m-desc">
+        依據<b>正式出車表</b>，各車專屬連結提供<b>點名、姓名法名、寮區、出坡單位</b>等資訊，
+        現場分<b>去程上車、回程上車、回程下車</b>三輪點名。
+      </div>
+      <ul class="feature-list">
+        <li>義工長按三秒自助報到，領隊後台可代為操作</li>
+        <li>領隊代碼登入，可凍結（確定不到）／解凍、撥打電話</li>
+        <li>可開關本車自助報到、清除本車點名記錄</li>
+        <li>每輪獨立統計已到／未到／應到人數</li>
+      </ul>
+      <div style="margin-top:10px"><span class="data-chip">📥 來源：正式出車表</span><span class="data-chip">📤 產出：即時點名狀態</span></div>
+    </div>
+  </div>
+
+  <!-- 階段5 -->
+  <div class="module pending">
+    <div class="module-head">
+      <div class="m-num">5</div>
+      <div class="m-title-wrap">
+        <div class="m-title">車隊群組</div>
+        <span class="m-status st-pending">⏳ 未完成</span>
+      </div>
+    </div>
+    <div class="module-body">
+      <div class="m-desc">
+        依據<b>正式出車表</b>，自動加入學員 LINE ID 來建立各車<b>車次 LINE 群組</b>，
+        減少人工加好友、邀請入群的作業。
+      </div>
+      <ul class="feature-list">
+        <li>學員透過官方帳號完成 LINE 綁定（取得 userId）</li>
+        <li>依出車表車次分組，自動推播群組邀請連結</li>
+        <li>產出已發送／未綁定清單，供人工補邀</li>
+      </ul>
+      <div style="margin-top:10px"><span class="data-chip">📥 來源：正式出車表＋LINE 綁定底冊</span><span class="data-chip">📤 產出：各車 LINE 群組</span></div>
+    </div>
+  </div>
+
+  <!-- 整體流程 -->
+  <div class="flow">
+    <div class="flow-title">📋 五階段作業流程</div>
+    <div class="flow-steps">
+      <div class="flow-step"><div class="flow-dot">1</div><div class="flow-label">報名（含修改／取消）</div></div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step"><div class="flow-dot">2</div><div class="flow-label">DVSS 派車・產生派車分頁</div></div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step"><div class="flow-dot">3</div><div class="flow-label">異動申請審核・產出正式出車表</div></div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step"><div class="flow-dot">4</div><div class="flow-label">車隊資訊看板・現場點名</div></div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step pending"><div class="flow-dot">5</div><div class="flow-label">車隊 LINE 群組自動建立</div></div>
+    </div>
+  </div>
+
+  <!-- 核心資料 -->
+  <div class="core">
+    <div class="core-title">🗄 核心資料庫</div>
+    <div class="core-name">DVSS 派車總表</div>
+    <div class="core-desc">
+      各階段皆以此試算表為唯一資料來源，即時讀寫、自動同步，<br>
+      確保報名、派車、異動、看板資料一致。<br>
+      由專人維護，不對外開放編輯。
+    </div>
+  </div>
+
+  <div class="legend">
+    <span><span class="dot dot-done"></span>已完成上線</span>
+    <span><span class="dot dot-pending"></span>規劃中</span>
+  </div>
+
+</div>
+
+<footer>AQE@2026 · 普高精舍活動數位化</footer>
+</body>
+</html>
