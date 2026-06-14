@@ -124,21 +124,6 @@
       min-height: 24px; margin-top: 10px; font-weight: 700; }
     .pin-error.ok { color: var(--green); }
 
-    /* ── 快速跳轉 ── */
-    .jump-bar { margin-bottom: 16px; position: relative; }
-    .jump-select {
-      width: 100%; padding: 14px 36px 14px 40px;
-      border: 2px solid #b8a080; border-radius: 12px;
-      background: #fff; font-family: 'Noto Sans TC',sans-serif;
-      font-size: 1.05rem; color: var(--ink); appearance: none;
-      -webkit-appearance: none; cursor: pointer; outline: none; font-weight: 600;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.04);
-    }
-    .jump-select:focus { border-color: var(--gold); }
-    .jump-icon  { position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
-      font-size: 1rem; color: #887050; pointer-events: none; }
-    .jump-arrow { position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
-      font-size: 1rem; color: var(--gray); pointer-events: none; }
 
     /* ── 區段標題與篩選 ── */
     .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
@@ -338,11 +323,6 @@
     <button id="admin-gear" onclick="openAdminSheet()" title="管理者">⚙️</button>
     <button id="logout-btn" onclick="location.reload()" title="登出">登出</button>
   </header>
-  <div id="top-stats">
-    <div class="top-stat-box"><div class="num num-gray"  id="ts-1">—</div><div class="lbl" id="ts-1-lbl">本車人數</div></div>
-    <div class="top-stat-box"><div class="num num-amber" id="ts-2">—</div><div class="lbl" id="ts-2-lbl">待處理</div></div>
-    <div class="top-stat-box"><div class="num num-green" id="ts-3">—</div><div class="lbl" id="ts-3-lbl">已核准</div></div>
-  </div>
 </div>
 
 <div id="main-body">
@@ -362,17 +342,6 @@
 
   <!-- ════ 領隊主頁 ════ -->
   <div id="leader-view" class="hidden">
-    <a id="sheet-link" class="btn btn-gold-outline btn-full mb-3 hidden" target="_blank" rel="noopener">
-      📋 開啟本車完整出車表
-    </a>
-
-    <div class="jump-bar">
-      <span class="jump-icon">🔍</span>
-      <select class="jump-select" id="jump-home" onchange="jumpToCard(this)">
-        <option value="">快速跳轉至姓名…</option>
-      </select>
-      <span class="jump-arrow">▼</span>
-    </div>
 
     <div class="section-header">
       <h2>📋 本車名單</h2>
@@ -401,6 +370,11 @@
       </div>
     </div>
     <div id="admin-list"></div>
+    <div style="margin-top:24px;padding-top:16px;border-top:2px dashed #e8d9c0">
+      <button class="btn btn-red btn-full" onclick="clearAllRequests()">
+        🗑 清除所有異動紀錄
+      </button>
+    </div>
   </div>
 
 </div>
@@ -506,14 +480,11 @@ function leaderLogin(){
     if (!d.ok) { err.textContent = d.msg; err.className = 'pin-error'; return; }
     Object.assign(S, { role:d.role, name:d.name, car:d.car, cars:d.cars,
                        roster:d.roster, sheetUrl:d.sheetUrl || '' });
-    $('page-title').textContent = '☸ ' + S.car + ' 車異動申請';
-    $('ts-1-lbl').textContent = '本車人數';
+    $('page-title').textContent = '☸ ' + S.car + ' 車異動申請' + (d.eventName ? '　' + d.eventName : '');
     $('logout-btn').classList.add('show');
     $('login-view').classList.add('hidden');
     $('leader-view').classList.remove('hidden');
-    $('top-stats').classList.add('show');
-    if (S.sheetUrl) { $('sheet-link').href = S.sheetUrl; $('sheet-link').classList.remove('hidden'); }
-    renderRoster(); fillJump(); loadMyRequests();
+    renderRoster(); loadMyRequests();
   }).catch(() => { err.textContent = '連線失敗，請稍後再試'; err.className = 'pin-error'; });
 }
 
@@ -534,13 +505,11 @@ function adminLogin(){
     if (!d.ok) { err.textContent = d.msg; err.className = 'form-msg err'; return; }
     closeAdminSheet();
     S.adminCode = code; S.cars = d.cars;
-    $('page-title').textContent = '☸ 異動審核管理';
-    $('ts-1-lbl').textContent = '申請總數'; $('ts-3-lbl').textContent = '已處理';
+    $('page-title').textContent = '☸ 異動審核管理' + (d.eventName ? '　' + d.eventName : '');
     $('logout-btn').classList.add('show');
     $('admin-gear').classList.add('hidden');
     $('login-view').classList.add('hidden');
     $('admin-view').classList.remove('hidden');
-    $('top-stats').classList.add('show');
     loadAdmin();
   }).catch(() => { err.textContent = '連線失敗，請稍後再試'; err.className = 'form-msg err'; });
 }
@@ -572,17 +541,8 @@ function renderRoster(){
       </div>
     </div>`;
   }).join('');
-  $('ts-1').textContent = S.roster.length;
 }
 
-function fillJump(){
-  $('jump-home').innerHTML = '<option value="">快速跳轉至姓名…</option>' +
-    S.roster.map(m => `<option value="card-${m.seq}">${m.seq}. ${m.name}</option>`).join('');
-}
-function jumpToCard(sel){
-  if (!sel.value) return;
-  const el = $(sel.value);
-  if (el) { el.scrollIntoView({ behavior:'smooth', block:'center' }); }
   sel.value = '';
 }
 function setFilter(f){
@@ -593,7 +553,7 @@ function setFilter(f){
 }
 function refreshLeader(){
   api({ action:'roster', car:S.car }).then(d => {
-    if (d.ok) { S.roster = d.roster; renderRoster(); fillJump(); }
+    if (d.ok) { S.roster = d.roster; renderRoster(); }
     loadMyRequests();
     toast('已更新');
   });
@@ -667,8 +627,6 @@ function loadMyRequests(){
     myReqMap = {};
     d.list.filter(r => r.status === '待處理')
           .forEach(r => { myReqMap[r.target] = (myReqMap[r.target] || 0) + 1; });
-    $('ts-2').textContent = d.list.filter(r => r.status === '待處理').length;
-    $('ts-3').textContent = d.list.filter(r => r.status === '已核准').length;
     renderRoster();
     $('my-req-list').innerHTML = d.list.length
       ? d.list.map(r => reqCardHTML(r, false)).join('')
@@ -712,10 +670,6 @@ function loadAdmin(){
   api({ action:'allRequests', code:S.adminCode }).then(d => {
     if (!d.ok) { $('admin-list').innerHTML = `<div class="empty-note">${d.msg}</div>`; return; }
     S.allReqs = d.list;
-    const pend = d.list.filter(r => r.status === '待處理').length;
-    $('ts-1').textContent = d.list.length;
-    $('ts-2').textContent = pend;
-    $('ts-3').textContent = d.list.length - pend;
     renderAdmin();
   });
 }
@@ -808,6 +762,14 @@ function doProcess(id, decision){
     msgEl.textContent = '連線失敗'; msgEl.className = 'ops-msg err';
     box.querySelectorAll('button').forEach(b => b.disabled = false);
   });
+}
+
+function clearAllRequests(){
+  if (!confirm('確定要清除畫面上所有異動紀錄嗎？\n（此操作只清除本頁顯示，不影響試算表中的資料）')) return;
+  if (!confirm('⚠️ 再次確認：清除後需重新整理頁面才能再次載入。\n確定清除？')) return;
+  S.allReqs = [];
+  renderAdmin();
+  toast('🗑 已清除所有異動紀錄顯示');
 }
 </script>
 </body>
