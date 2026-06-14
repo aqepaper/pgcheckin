@@ -336,7 +336,7 @@
   <header>
     <h1 id="page-title">☸ 出車異動申請</h1>
     <button id="admin-gear" onclick="openAdminSheet()" title="管理者">⚙️</button>
-    <button id="logout-btn" onclick="location.reload()" title="登出">⎋</button>
+    <button id="logout-btn" onclick="location.reload()" title="登出">登出</button>
   </header>
   <div id="top-stats">
     <div class="top-stat-box"><div class="num num-gray"  id="ts-1">—</div><div class="lbl" id="ts-1-lbl">本車人數</div></div>
@@ -454,7 +454,7 @@
     <div class="sheet-handle"></div>
     <div id="admin-login-panel">
       <div class="sheet-title">⚙️ 管理者登入</div>
-      <input type="password" class="form-select" id="admin-input" inputmode="numeric"
+      <input type="tel" class="form-select" id="admin-input" inputmode="numeric"
         autocomplete="off" placeholder="••••"
         style="text-align:center;font-size:2rem;letter-spacing:.4em;font-weight:900;"
         onkeydown="if(event.key==='Enter')adminLogin()">
