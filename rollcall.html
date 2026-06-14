@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>出車點名</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700;900&family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #111122;
+      --gold: #aa7a00;
+      --gold-light: #d4a017;
+      --gold-pale: #fbf7ee;
+      --gold-border: #dfbe40;
+      --maroon: #801818;
+      --cream: #f7f4ed;
+      --gray: #333333;
+      --gray-light: #e2e2e2;
+      --white: #ffffff;
+      --green: #0f522e;
+      --green-pale: #eaf5ed;
+      --green-border: #a3d9b9;
+      --red: #b21822;
+      --red-pale: #fff2f2;
+      --red-border: #ffccd0;
+      --amber: #b85c00;
+      --teal: #1e4238;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 18px; -webkit-text-size-adjust: 100%; }
+    body {
+      font-family: 'Noto Sans TC', sans-serif;
+      background: var(--cream); color: var(--ink);
+      min-height: 100vh; max-width: 480px; margin: 0 auto;
+      box-shadow: 0 0 40px rgba(0,0,0,0.12); line-height: 1.6;
+    }
+
+    #loading-bar {
+      display: none; position: fixed; top: 0; left: 0; right: 0; height: 5px;
+      background: linear-gradient(90deg,var(--gold),var(--gold-light),var(--gold));
+      background-size: 200% 100%; animation: shimmer 1.2s infinite; z-index: 9999;
+    }
+    @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+    /* ── 置頂 ── */
+    #sticky-top { position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+    header {
+      background: #fdf8f0; padding: 12px 60px 12px 14px; text-align: center;
+      border-bottom: 2px solid #e8d9c0; position: relative;
+    }
+    header h1 {
+      font-family: 'Noto Serif TC',serif; font-size: 1.33rem; font-weight: 900;
+      letter-spacing: .04em; color: var(--maroon);
+    }
+    #leader-gear {
+      position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+      width: 40px; height: 40px; border-radius: 50%;
+      background: linear-gradient(135deg,#fffbf3,#f3e5cc);
+      border: 1.5px solid var(--gold-border);
+      font-size: 1.2rem; cursor: pointer; display: flex;
+      align-items: center; justify-content: center;
+      box-shadow: 0 2px 5px rgba(184,134,11,0.15);
+      -webkit-tap-highlight-color: transparent; z-index: 101;
+      transition: all 0.2s;
+    }
+    #leader-gear:active { transform: translateY(-50%) scale(0.9); background: #f3e5cc; }
+
+    /* ── 輪次切換 ── */
+    #round-tabs {
+      display: flex; gap: 6px; padding: 10px 10px 0;
+      background: #faf7f2;
+    }
+    .round-tab {
+      flex: 1; padding: 11px 4px; border-radius: 12px 12px 0 0;
+      border: 2px solid #e0d0b0; border-bottom: none;
+      background: #f3ecdf; color: #8a7050;
+      font-family: 'Noto Serif TC',serif; font-weight: 900; font-size: .95rem;
+      cursor: pointer; -webkit-tap-highlight-color: transparent;
+      text-align: center; transition: all .15s; line-height: 1.3;
+    }
+    .round-tab small { display: block; font-family: 'Noto Sans TC',sans-serif;
+      font-size: .68rem; font-weight: 700; color: #a89070; }
+    .round-tab.active {
+      background: #fff; color: var(--maroon); border-color: var(--maroon);
+      box-shadow: 0 -2px 8px rgba(128,24,24,0.08);
+    }
+    .round-tab.active small { color: var(--maroon); }
+
+    /* ── 統計 ── */
+    #top-stats {
+      display: grid; grid-template-columns: repeat(3,1fr);
+      background: #faf7f2; padding: 10px; gap: 8px;
+      border-bottom: 2px solid #e8d9c0;
+    }
+    .top-stat-box {
+      background: #fff; border-radius: 12px; padding: 8px 4px;
+      text-align: center; border: 2px solid #ede0cc;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.02);
+    }
+    .top-stat-box .num {
+      font-size: 1.6rem; font-weight: 900;
+      font-family: 'Noto Serif TC',serif; line-height: 1;
+    }
+    .top-stat-box .lbl { font-size: .85rem; color: #5a4020; margin-top: 4px; font-weight: 700; }
+    .num-green { color: var(--green); }
+    .num-red   { color: var(--red); }
+    .num-gray  { color: #5a4020; }
+
+    /* ── 主體 ── */
+    #main-body { padding: 14px 14px 60px; }
+
+    #self-disabled-note {
+      display: none; background: var(--red-pale); border: 2px solid var(--red-border);
+      border-radius: 12px; padding: 12px; font-size: .95rem; font-weight: 700;
+      color: var(--red); text-align: center; margin-bottom: 14px;
+    }
+    #readonly-bar {
+      display: none; background: linear-gradient(135deg,#fff8e1,#fffde7);
+      border: 2px solid var(--gold-border); border-radius: 12px;
+      padding: 12px; text-align: center; font-size: .95rem;
+      color: #78350f; font-weight: 700; margin-bottom: 14px;
+    }
+    #err-screen {
+      display: none; padding: 60px 24px; text-align: center;
+    }
+    #err-screen .e-icon { font-size: 3rem; }
+    #err-screen .e-msg { font-size: 1.05rem; font-weight: 700; color: var(--maroon); margin-top: 14px; line-height: 2; }
+
+    /* ── 快速跳轉 ── */
+    .jump-bar { margin-bottom: 16px; position: relative; }
+    .jump-select {
+      width: 100%; padding: 14px 36px 14px 40px;
+      border: 2px solid #b8a080; border-radius: 12px;
+      background: #fff; font-family: 'Noto Sans TC',sans-serif;
+      font-size: 1.05rem; color: var(--ink); appearance: none;
+      -webkit-appearance: none; cursor: pointer; outline: none; font-weight: 600;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+    }
+    .jump-select:focus { border-color: var(--gold); }
+    .jump-icon  { position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
+      font-size: 1rem; color: #887050; pointer-events: none; }
+    .jump-arrow { position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
+      font-size: 1rem; color: var(--gray); pointer-events: none; }
+
+    /* ── 篩選列 ── */
+    .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .section-header h2 { font-family: 'Noto Serif TC',serif; font-size: 1.2rem; font-weight: 900; color: var(--maroon); }
+    .filter-bar { display: flex; gap: 6px; }
+    .filter-btn {
+      padding: 10px 14px; font-size: .92rem; border-radius: 10px;
+      border: 2px solid #b8a080; background: var(--white); color: var(--ink);
+      font-family: 'Noto Sans TC',sans-serif; font-weight: 700;
+      cursor: pointer; -webkit-tap-highlight-color: transparent; white-space: nowrap;
+      transition: all 0.2s;
+    }
+    .filter-btn.active { border-color: var(--maroon); background: #fff5f5; color: var(--maroon);
+      box-shadow: 0 2px 6px rgba(128,24,24,0.15); }
+
+    /* ── 主頁名單卡片 ── */
+    .cards-grid { display: flex; flex-direction: column; gap: 10px; }
+    .card {
+      background: #fdf9f3; border-radius: 16px; padding: 14px 16px;
+      box-shadow: 0 4px 12px rgba(90,64,32,0.06); border: 2px solid #ede0cc;
+      cursor: pointer; -webkit-tap-highlight-color: transparent;
+      transition: all 0.2s ease; display: flex; flex-direction: column; gap: 8px;
+    }
+    .card:active { transform: scale(0.98); box-shadow: 0 2px 6px rgba(0,0,0,.05); opacity: .9; }
+    .card.frozen { cursor: default; }
+    .card.present { border-color: var(--green); border-width: 3px; background: linear-gradient(135deg,#c8ecd6,#dff5e8); }
+    .card.frozen  { border-color: var(--red); border-width: 2px; background: #fff5f5; opacity: .78; }
+    .card.core-leader { border: 2px solid var(--gold-border); background: linear-gradient(135deg,#fefbf3,#fdf7e8); }
+    .card.core-leader.present { border-color: var(--green); border-width: 3px; background: linear-gradient(135deg,#c8ecd6,#dff5e8); }
+
+    .card-row1 { display: flex; align-items: center; gap: 12px; }
+    .card-order {
+      font-family: 'Noto Serif TC',serif; font-size: 1.25rem; font-weight: 900; color: var(--maroon);
+      background: #fdf2f2; padding: 2px 8px; border-radius: 6px; min-width: 38px; text-align: center;
+    }
+    .card-name   { font-size: 1.2rem; font-weight: 700; color: var(--ink); }
+    .card-dharma { font-size: .95rem; color: #555; font-weight: 500;
+      background: #efe8dc; padding: 2px 8px; border-radius: 4px; }
+    .card-phone  { font-family: monospace; font-size: 1rem; color: #5a4020;
+      margin-left: auto; font-weight: 700; white-space: nowrap; }
+    .card-row2 { display: flex; align-items: center; flex-wrap: wrap; gap: 6px;
+      border-top: 1px dashed #efe8dc; padding-top: 8px; }
+
+    .badge { display: inline-block; padding: 5px 12px; border-radius: 20px; font-size: .88rem; font-weight: 900; }
+    .badge-present { background: var(--green-pale); color: var(--green); border: 1px solid var(--green-border); }
+    .badge-none    { background: #f0f0f0; color: #444; border: 1px solid #ccc; }
+    .badge-frozen  { background: #ffd6d6; color: #a03030; border: 1px solid #e07070; }
+
+    .tag { display: inline-block; font-size: .78rem; padding: 3px 8px; border-radius: 8px; font-weight: 700; }
+    .tag-m    { background: #e3f2fd; color: #0d47a1; }
+    .tag-f    { background: #fce4ec; color: #880e4f; }
+    .tag-unit { background: #f3e8ff; color: #5b21b6; }
+    .tag-id   { background: #e8f5e9; color: #2e7d32; }
+    .tag-role { background: #fdf2f2; color: var(--maroon); border: 1px solid #e8c0c0; }
+
+    /* ── 報到卡片（領隊後台／自助） ── */
+    .sw-outer {
+      background: #fdf9f3; border-radius: 16px;
+      border: 2px solid var(--gray-light); margin-bottom: 12px; overflow: hidden;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.04);
+    }
+    .sw-outer.present { border-color: var(--green); border-width: 3px; background: linear-gradient(135deg,#c8ecd6,#dff5e8); }
+    .sw-outer.frozen  { border-color: var(--red); border-width: 2px; background: #fff5f5; }
+    .sw-card-info { display: flex; flex-direction: column; padding: 14px 16px 10px; gap: 8px; }
+    .sw-row1 { display: flex; align-items: center; gap: 12px; }
+    .sw-order {
+      font-family: 'Noto Serif TC',serif; font-size: 1.25rem; font-weight: 900; color: var(--maroon);
+      background: #fdf2f2; padding: 2px 8px; border-radius: 6px; min-width: 38px; text-align: center;
+    }
+    .sw-name   { font-size: 1.2rem; font-weight: 700; }
+    .sw-dharma { font-size: .95rem; color: #555; background: #efe8dc; padding: 2px 8px; border-radius: 4px; }
+    .sw-phone  { font-size: 1rem; color: #1a4a8a; margin-left: auto; font-weight: 700;
+      text-decoration: none; white-space: nowrap; }
+    .sw-phone:active { opacity: .7; }
+    .sw-row2 { display: flex; align-items: center; flex-wrap: wrap; gap: 6px;
+      border-top: 1px dashed #e2e2e2; padding-top: 8px; }
+    .sw-time { font-size: .78rem; color: var(--green); font-weight: 700; margin-left: auto; }
+    .sw-badge-wrap { margin-left: auto; }
+
+    /* ── 長按按鈕 ── */
+    .sw-action-row { display: flex; gap: 10px; padding: 4px 16px 14px; }
+    .hold-btn {
+      flex: 1; position: relative; overflow: hidden;
+      padding: 16px 8px; border-radius: 14px; border: none;
+      font-family: 'Noto Sans TC',sans-serif; font-weight: 900; font-size: .88rem;
+      cursor: pointer; -webkit-tap-highlight-color: transparent;
+      display: flex; flex-direction: column; align-items: center; gap: 6px;
+      user-select: none; touch-action: manipulation; min-height: 72px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+      transition: transform 0.1s ease, box-shadow 0.1s ease;
+    }
+    .hold-btn .hb-icon  { font-size: 1.5rem; line-height: 1; }
+    .hold-btn .hb-label { font-size: .82rem; text-align: center; font-weight: 800; }
+    .hold-btn.holding   { transform: scale(0.96); animation: pulse-border 1.5s infinite alternate; }
+    @keyframes pulse-border {
+      from { box-shadow: 0 0 0 0 rgba(180,120,60,0.3); }
+      to   { box-shadow: 0 0 0 6px rgba(180,120,60,0); }
+    }
+    .hold-progress {
+      position: absolute; inset: 0; width: 0%;
+      pointer-events: none; transition: none; border-radius: 14px;
+    }
+    .hold-btn .hb-content { position: relative; z-index: 1;
+      display: flex; flex-direction: column; align-items: center; gap: 4px; }
+
+    .hb-checkin { background: #f8f5f0; color: #5a4a3a; border: 2px solid #d8c8b0; }
+    .hb-checkin .hold-progress { background: #b8a080; opacity: .35; }
+    .hb-undo    { background: var(--red-pale); color: var(--red); border: 2px solid var(--red-border); }
+    .hb-undo .hold-progress { background: var(--red); opacity: .25; }
+    .hb-freeze  { background: #f5f5f5; color: #444; border: 2px solid #ccc; }
+    .hb-freeze .hold-progress { background: #888; opacity: .20; }
+    .hb-freeze.is-frozen { background: var(--red-pale); color: #a03030; border-color: #e07070; }
+    .hb-freeze.is-frozen .hold-progress { background: #e07070; opacity: .25; }
+    .hb-disabled { background: #f5f5f5; color: #999; border: 2px solid #e0e0e0; cursor: not-allowed; }
+
+    /* ══ Modal / Bottom Sheet ══ */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.6); z-index: 500;
+      align-items: flex-end; justify-content: center;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal-sheet {
+      background: #fff; border-radius: 24px 24px 0 0;
+      padding: 0 18px 36px; width: 100%; max-width: 480px;
+      box-shadow: 0 -8px 40px rgba(0,0,0,.25);
+      animation: slideUp .22s ease; max-height: 92vh; overflow-y: auto;
+    }
+    @keyframes slideUp{from{transform:translateY(60px);opacity:0}to{transform:translateY(0);opacity:1}}
+    .sheet-handle { width: 50px; height: 6px; background: #ccc; border-radius: 4px; margin: 16px auto 20px; }
+    .sheet-title {
+      font-family: 'Noto Serif TC',serif; font-size: 1.3rem; font-weight: 900;
+      color: var(--maroon); text-align: center; margin-bottom: 18px;
+    }
+
+    /* PIN */
+    .pin-label { font-size: 1rem; color: var(--ink); margin-bottom: 12px; font-weight: 700; text-align: center; }
+    .pin-field {
+      width: 100%; padding: 16px; font-size: 2.4rem; text-align: center; letter-spacing: .4em;
+      border: 2.5px solid #c8b48a; border-radius: 14px;
+      background: var(--gold-pale); color: var(--ink);
+      font-family: 'Noto Serif TC',serif; font-weight: 900;
+      outline: none; -webkit-appearance: none;
+    }
+    .pin-field:focus { border-color: var(--gold); box-shadow: 0 0 0 4px rgba(184,134,11,.15); background:#fff; }
+    .pin-submit {
+      width: 100%; border: none; border-radius: 14px; padding: 16px;
+      font-family: 'Noto Serif TC',serif; font-size: 1.15rem; letter-spacing: 4px; font-weight: 900;
+      background: #ccc; color: #fff; cursor: pointer; transition: all .2s; margin-top: 14px;
+    }
+    .pin-submit.ready { background: linear-gradient(135deg,var(--teal),#1e4238);
+      box-shadow: 0 4px 15px rgba(45,93,79,.3); }
+    .pin-submit.ready:active { transform: scale(.98); }
+    .pin-error { text-align: center; font-size: .95rem; color: var(--red);
+      min-height: 24px; margin-top: 10px; font-weight: 700; }
+
+    /* 領隊後台 */
+    .leader-section { margin-bottom: 16px; }
+    .leader-section-title {
+      font-family: 'Noto Serif TC',serif; font-size: 1.05rem; font-weight: 900;
+      color: var(--maroon); margin-bottom: 12px; padding-bottom: 8px;
+      border-bottom: 2px solid #f5e6cc;
+    }
+    .admin-summary { display: grid; grid-template-columns: repeat(2,1fr); gap: 10px; margin-bottom: 14px; }
+    .sum-box { background: #fffaf5; border-radius: 14px; padding: 14px; text-align: center;
+      border: 2px solid #ffe0b2; box-shadow: inset 0 1px 3px rgba(0,0,0,0.02); }
+    .sum-box .s-num { font-size: 2rem; font-weight: 900; font-family: 'Noto Serif TC',serif; line-height: 1; }
+    .sum-box .s-lbl { font-size: .85rem; color: #5a4020; margin-top: 4px; font-weight: 700; }
+
+    /* 領隊面板輪次切換（小型） */
+    .mini-rounds { display: flex; gap: 6px; margin-bottom: 14px; }
+    .mini-round {
+      flex: 1; padding: 10px 4px; border-radius: 10px;
+      border: 2px solid #b8a080; background: #fff; color: #8a7050;
+      font-family: 'Noto Sans TC',sans-serif; font-weight: 900; font-size: .88rem;
+      cursor: pointer; -webkit-tap-highlight-color: transparent; text-align: center;
+    }
+    .mini-round.active { border-color: var(--maroon); background: #fff5f5; color: var(--maroon); }
+
+    /* 通用按鈕 */
+    .btn {
+      display: inline-block; padding: 15px 18px; border-radius: 14px; border: none;
+      font-family: 'Noto Sans TC',sans-serif; font-weight: 900; font-size: 1rem;
+      cursor: pointer; transition: opacity .15s; text-align: center;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn:active { opacity: .72; }
+    .btn-green   { background: var(--green); color: #fff; }
+    .btn-red     { background: var(--red); color: #fff; }
+    .btn-gray    { background: #555; color: #fff; }
+    .btn-outline { background: var(--white); border: 2.5px solid var(--maroon); color: var(--maroon); }
+    .btn-full    { width: 100%; display: block; }
+    .leader-bottom-btns { display: flex; flex-direction: column; gap: 10px; margin-top: 18px; padding-bottom: 6px; }
+
+    #back-to-top {
+      display: none; position: fixed; bottom: 28px; right: 18px;
+      width: 48px; height: 48px; border-radius: 50%;
+      background: var(--maroon); color: #fff;
+      border: none; font-size: 1.3rem; font-weight: 900;
+      cursor: pointer; z-index: 600;
+      box-shadow: 0 4px 14px rgba(0,0,0,.25);
+      -webkit-tap-highlight-color: transparent;
+    }
+    #back-to-top.show { display: flex; align-items: center; justify-content: center; }
+
+    .flex-gap { display: flex; gap: 10px; }
+    .mt-3 { margin-top: 14px; } .mt-4 { margin-top: 16px; } .mb-3 { margin-bottom: 14px; }
+    .hidden { display: none !important; }
+
+    #toast {
+      position: fixed; bottom: 36px; left: 50%;
+      transform: translateX(-50%) translateY(120px);
+      background: #111; color: #fff; padding: 14px 26px;
+      border-radius: 40px; font-size: 1rem; font-weight: 700;
+      z-index: 9999; transition: transform .28s;
+      white-space: nowrap; box-shadow: 0 8px 28px rgba(0,0,0,.35);
+    }
+    #toast.show { transform: translateX(-50%) translateY(0); }
+    footer { text-align: center; padding: 18px 0 36px; color: #bbb; font-size: .7rem; }
+  </style>
+</head>
+<body>
+<div id="loading-bar"></div>
+
+<div id="sticky-top">
+  <header>
+    <h1 id="page-title">☸ 出車點名</h1>
+    <button id="leader-gear" onclick="openLeaderSheet()" title="領隊專區">⚙️</button>
+  </header>
+  <div id="round-tabs">
+    <button class="round-tab active" id="rt-go"   onclick="setRound('go')">去程<small>上車點名</small></button>
+    <button class="round-tab"        id="rt-back" onclick="setRound('back')">回程<small>上車點名</small></button>
+    <button class="round-tab"        id="rt-off"  onclick="setRound('off')">回程<small>下車點名</small></button>
+  </div>
+  <div id="top-stats">
+    <div class="top-stat-box"><div class="num num-green" id="ts-present">—</div><div class="lbl">已到</div></div>
+    <div class="top-stat-box"><div class="num num-red"   id="ts-pending">—</div><div class="lbl">未到</div></div>
+    <div class="top-stat-box"><div class="num num-gray"  id="ts-total">—</div><div class="lbl">應到</div></div>
+  </div>
+</div>
+
+<div id="err-screen">
+  <div class="e-icon">🚌</div>
+  <div class="e-msg" id="err-msg">請由各車專屬連結進入<br>例如：?car=A1</div>
+</div>
+
+<div id="main-body">
+  <div id="self-disabled-note">⛔ 領隊已關閉自助報到功能</div>
+  <div id="readonly-bar">👁 唯讀模式・僅供查閱</div>
+
+  <div class="jump-bar">
+    <span class="jump-icon">🔍</span>
+    <select class="jump-select" id="jump-home" onchange="jumpToCard(this,'card-')">
+      <option value="">快速跳轉至姓名…</option>
+    </select>
+    <span class="jump-arrow">▼</span>
+  </div>
+
+  <div class="section-header">
+    <h2 id="list-title">📋 名單</h2>
+    <div class="filter-bar">
+      <button class="filter-btn active" id="filter-all"     onclick="setFilter('all')">全部</button>
+      <button class="filter-btn"        id="filter-pending" onclick="setFilter('pending')">未到</button>
+      <button class="filter-btn"                            onclick="refreshMain()">🔄 更新</button>
+    </div>
+  </div>
+  <div id="cards" class="cards-grid"></div>
+</div>
+
+<footer id="footer">AQE@2026 · 出車點名</footer>
+<div id="toast"></div>
+<button id="back-to-top">↑</button>
+
+<!-- ════ 卡片自助報到 Sheet ════ -->
+<div class="modal-overlay" id="card-self-sheet">
+  <div class="modal-sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title" id="self-sheet-title">🙋 自助報到</div>
+    <div id="card-action-area"></div>
+    <button class="btn btn-gray btn-full mt-3" onclick="closeCardSelfSheet()">關閉</button>
+  </div>
+</div>
+
+<!-- ════ 領隊專區 Sheet ════ -->
+<div class="modal-overlay" id="leader-sheet">
+  <div class="modal-sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">⚙️ 領隊專區</div>
+
+    <div id="leader-login-panel">
+      <div class="pin-label">請輸入領隊代碼</div>
+      <input type="tel" class="pin-field" id="leader-pin-input"
+        maxlength="4" inputmode="numeric" pattern="[0-9]*" autocomplete="off" placeholder="••••"
+        oninput="onLeaderPinInput(this)"
+        onkeydown="if(event.key==='Enter'&&!document.getElementById('leader-pin-submit').disabled)doLeaderLogin()">
+      <button class="pin-submit" id="leader-pin-submit" disabled onclick="doLeaderLogin()">進　入</button>
+      <div class="pin-error" id="leader-login-err"></div>
+      <button class="btn btn-gray btn-full mt-3" onclick="closeLeaderSheet()">取消</button>
+    </div>
+
+    <div id="leader-panel" class="hidden">
+      <div class="leader-section">
+        <div class="leader-section-title">⚡ 點名管理</div>
+        <div class="mini-rounds">
+          <button class="mini-round active" id="mr-go"   onclick="setRound('go')">去程上車</button>
+          <button class="mini-round"        id="mr-back" onclick="setRound('back')">回程上車</button>
+          <button class="mini-round"        id="mr-off"  onclick="setRound('off')">回程下車</button>
+        </div>
+        <div class="admin-summary">
+          <div class="sum-box"><div class="s-num num-green" id="adm-present">—</div><div class="s-lbl">已到</div></div>
+          <div class="sum-box"><div class="s-num num-red"   id="adm-pending">—</div><div class="s-lbl">未到</div></div>
+        </div>
+        <div class="jump-bar">
+          <span class="jump-icon">🔍</span>
+          <select class="jump-select" id="jump-leader" onchange="jumpToCard(this,'swo-')">
+            <option value="">快速跳轉至姓名…</option>
+          </select>
+          <span class="jump-arrow">▼</span>
+        </div>
+        <div id="checkin-list"></div>
+      </div>
+
+      <div class="leader-section">
+        <div class="leader-section-title">🛠 功能設定</div>
+        <button class="btn btn-outline btn-full" id="self-toggle-btn" onclick="toggleSelfCheckin()">⏳ 載入中…</button>
+      </div>
+
+      <div class="leader-bottom-btns">
+        <button class="btn btn-gray btn-full" onclick="leaderRefresh()">🔄 重新同步</button>
+        <button class="btn btn-gray btn-full" onclick="leaderLogout()">退出領隊後台</button>
+        <button class="btn btn-red btn-full"  onclick="clearAllData()">🗑 清除本車所有點名記錄</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ╔══════════════════════════════════════════════════════╗
+// ║  ★ 部署設定（需要更改時只需修改此區塊）              ║
+// ╠══════════════════════════════════════════════════════╣
+const GAS_DEPLOY_ID = 'AKfycbwRcikrUa3gBVKWA1GdOhBF4buqWODgyO04gUPc8nYlMY3USeQQ824urMcqwFnFG3MT';
+const LEADER_CODE   = '7777';   // 領隊登入代碼（全車統一，需與後端一致）
+// ╚══════════════════════════════════════════════════════╝
+
+const API     = `https://script.google.com/macros/s/${GAS_DEPLOY_ID}/exec`;
+const HOLD_MS = 3000;
+const CAR     = (new URLSearchParams(location.search).get('car') || '').trim().toUpperCase();
+const ROUND_NAMES = { go:'去程上車', back:'回程上車', off:'回程下車' };
+
+let data               = { students: [], statuses: { go:{}, back:{}, off:{} }, frozen: [] };
+let currentRound       = 'go';
+let isLeader           = false;
+let selfCheckinEnabled = true;
+let filterMode         = 'all';
+let isReadonly         = false;
+let selfStudent        = null;
+
+// ── 工具 ──
+function isFrozen(key){ return data.frozen.includes(key); }
+function getSt(key){ return (data.statuses[currentRound] || {})[key] || null; }
+function isPresent(key){ return !isFrozen(key) && !!getSt(key); }
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function setLoading(on){ document.getElementById('loading-bar').style.display = on?'block':'none'; }
+let _tt;
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(_tt); _tt = setTimeout(()=>t.classList.remove('show'), 2800);
+}
+function triggerVibrate(){ if(navigator.vibrate) navigator.vibrate(120); }
+
+// 本輪應點名名單：去程輪＝去程搭本車者；回程兩輪＝回程搭本車者
+function eligibleStudents(){
+  return data.students.filter(s =>
+    currentRound === 'go' ? s.go === CAR : s.back === CAR);
+}
+function calcStats(){
+  const active  = eligibleStudents().filter(s => !isFrozen(s.key));
+  const present = active.filter(s => isPresent(s.key)).length;
+  return { total: active.length, present, pending: active.length - present };
+}
+
+// ── API ──
+async function apiCall(p){
+  const res = await fetch(API + '?' + new URLSearchParams(Object.assign({ car: CAR }, p)));
+  return res.json();
+}
+async function loadData(){
+  setLoading(true);
+  try {
+    const r = await apiCall({ action: 'getAll' });
+    if(r && r.ok){
+      r.statuses = Object.assign({ go:{}, back:{}, off:{} }, r.statuses || {});
+      r.frozen   = r.frozen || [];
+      if(typeof r.selfCheckin === 'boolean') selfCheckinEnabled = r.selfCheckin;
+      if(r.eventName) {
+        document.getElementById('page-title').textContent = '☸ ' + CAR + ' 車出車點名　' + r.eventName;
+        document.title = CAR + ' 車點名　' + r.eventName;
+        document.getElementById('footer').textContent = 'AQE@2026 · 出車點名 · ' + CAR + ' 車 · ' + r.eventName;
+      }
+      data = r;
+    } else if (r && r.msg) {
+      showErr('⚠ ' + r.msg);
+    }
+  } catch(e){ showToast('⚠ 無法連線雲端'); }
+  setLoading(false);
+}
+function showErr(msg){
+  document.getElementById('err-msg').innerHTML = msg;
+  document.getElementById('err-screen').style.display = 'block';
+  document.getElementById('main-body').style.display = 'none';
+  document.getElementById('round-tabs').style.display = 'none';
+  document.getElementById('top-stats').style.display = 'none';
+  document.getElementById('leader-gear').style.display = 'none';
+}
+
+// ── 輪次 ──
+function setRound(r){
+  currentRound = r;
+  ['go','back','off'].forEach(k => {
+    document.getElementById('rt-' + k).classList.toggle('active', k === r);
+    const m = document.getElementById('mr-' + k);
+    if(m) m.classList.toggle('active', k === r);
+  });
+  document.getElementById('list-title').textContent = '📋 ' + ROUND_NAMES[r] + '名單';
+  renderMain();
+  if(isLeader){ renderCheckinList(); buildJumpSelect('jump-leader'); }
+}
+
+// ── 統計 ──
+function renderStats(){
+  const { total, present, pending } = calcStats();
+  ['ts-present','adm-present'].forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent=present; });
+  ['ts-pending','adm-pending'].forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent=pending; });
+  const t = document.getElementById('ts-total'); if(t) t.textContent = total;
+}
+
+// ── 標籤 ──
+function tagHtml(s){
+  let h = '';
+  if(s.gender) h += `<span class="tag tag-${s.gender==='女'?'f':'m'}">${esc(s.gender)}</span>`;
+  if(s.unit)   h += `<span class="tag tag-unit">${esc(s.unit)}</span>`;
+  if(s.role)   h += `<span class="tag tag-role">${esc(s.role)}</span>`;
+  if(s.tag)    h += `<span class="tag tag-id">${esc(s.tag)}</span>`;
+  return h;
+}
+
+// ── 快速跳轉 ──
+function buildJumpSelect(selId){
+  const sel = document.getElementById(selId); if(!sel) return;
+  while(sel.options.length > 1) sel.remove(1);
+  eligibleStudents().slice().sort((a,b)=>Number(a.order)-Number(b.order)).forEach(s => {
+    const opt = document.createElement('option');
+    opt.value = s.key;
+    const fr = isFrozen(s.key), pr = isPresent(s.key);
+    opt.textContent = `${fr?'❄':pr?'✅':'⬜'} ${s.order}. ${s.name}${s.dharma?' '+s.dharma:''}`;
+    sel.appendChild(opt);
+  });
+}
+function jumpToCard(sel, prefix){
+  const key = sel.value; if(!key) return;
+  const el = document.getElementById(prefix + key);
+  if(el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  sel.value = '';
+}
+
+// ── 主體渲染 ──
+function renderMain(){
+  renderStats();
+  const selfNote = document.getElementById('self-disabled-note');
+  const roBar    = document.getElementById('readonly-bar');
+  const gear     = document.getElementById('leader-gear');
+  if(isReadonly){
+    gear.classList.add('hidden');
+    roBar.style.display = 'block';
+    if(selfNote) selfNote.style.display = 'none';
+  } else {
+    gear.classList.remove('hidden');
+    roBar.style.display = 'none';
+    if(selfNote) selfNote.style.display = selfCheckinEnabled ? 'none' : 'block';
+  }
+  renderCards();
+  buildJumpSelect('jump-home');
+}
+async function refreshMain(){ await loadData(); renderMain(); showToast('✅ 已更新'); }
+
+function setFilter(mode){
+  filterMode = mode;
+  document.getElementById('filter-all').classList.toggle('active', mode==='all');
+  document.getElementById('filter-pending').classList.toggle('active', mode==='pending');
+  renderCards();
+}
+
+// ── 主頁名單卡片 ──
+function renderCards(){
+  const c = document.getElementById('cards');
+  let sorted = eligibleStudents().sort((a,b)=>Number(a.order)-Number(b.order));
+  if(!sorted.length){
+    c.innerHTML = '<div style="text-align:center;color:var(--gray);padding:36px;">本輪沒有應點名名單</div>';
+    return;
+  }
+  if(filterMode === 'pending') sorted = sorted.filter(s => !isPresent(s.key) && !isFrozen(s.key));
+  c.innerHTML = '';
+  sorted.forEach(s => {
+    const fr   = isFrozen(s.key);
+    const pr   = isPresent(s.key);
+    const isCore = !!s.role;               // 領隊／副領隊金框
+    const el   = document.createElement('div');
+    let cls = 'card';
+    if(fr)            cls += ' frozen';
+    else if(pr)       cls += ' present';
+    if(isCore && !fr) cls += ' core-leader';
+    el.className = cls;
+    el.id = 'card-' + s.key;
+    if(!fr && !isReadonly) el.onclick = () => openCardSelfSheet(s.key);
+
+    const phoneHtml = (isCore && s.phone)
+      ? `<span class="card-phone">${esc(s.phone)}</span>` : '';
+
+    el.innerHTML = `
+      <div class="card-row1">
+        <span class="card-order">${s.order}</span>
+        <span class="card-name">${esc(s.name)}</span>
+        ${s.dharma ? `<span class="card-dharma">${esc(s.dharma)}</span>` : ''}
+        ${phoneHtml}
+      </div>
+      <div class="card-row2">
+        ${tagHtml(s)}
+        <span style="margin-left:auto;">
+          ${fr  ? '<span class="badge badge-frozen">❄ 凍結</span>'
+          : pr  ? '<span class="badge badge-present">已到</span>'
+                : '<span class="badge badge-none">未到</span>'}
+        </span>
+      </div>`;
+    c.appendChild(el);
+  });
+}
+
+// ══════════════════════════════════════
+// 長按核心
+// ══════════════════════════════════════
+function attachHold(btn, onComplete){
+  const prog = btn.querySelector('.hold-progress');
+  let raf = null, startT = 0, active = false;
+  function start(){
+    if(btn.classList.contains('hb-disabled')) return;
+    active = true; startT = Date.now();
+    btn.classList.add('holding');
+    function tick(){
+      if(!active) return;
+      const pct = Math.min(100, (Date.now()-startT)/HOLD_MS*100);
+      prog.style.width = pct + '%';
+      if(pct < 100) raf = requestAnimationFrame(tick);
+      else { cancel(); onComplete(); }
+    }
+    raf = requestAnimationFrame(tick);
+  }
+  function cancel(){
+    active = false; cancelAnimationFrame(raf);
+    prog.style.width = '0%'; btn.classList.remove('holding');
+  }
+  btn.addEventListener('mousedown',   start);
+  btn.addEventListener('touchstart',  start, { passive: true });
+  btn.addEventListener('mouseup',     cancel);
+  btn.addEventListener('mouseleave',  cancel);
+  btn.addEventListener('touchend',    cancel, { passive: true });
+  btn.addEventListener('touchcancel', cancel, { passive: true });
+}
+
+// ── 建立報到卡片 ──
+function buildActionCard(s, selfMode){
+  const key  = s.key;
+  const fr   = isFrozen(key);
+  const pr   = isPresent(key);
+  const st   = getSt(key);
+
+  const outer = document.createElement('div');
+  outer.className = 'sw-outer' + (fr ? ' frozen' : pr ? ' present' : '');
+  outer.id = 'swo-' + key;
+
+  const phoneHtml = (!selfMode && s.phone)
+    ? `<a class="sw-phone" href="tel:${s.phone.replace(/[^0-9+]/g,'')}">📞 ${esc(s.phone)}</a>`
+    : '';
+  const timeStr = st && st.t && !fr
+    ? `<span class="sw-time">⏱${esc(st.t)}</span>` : '';
+
+  const info = document.createElement('div');
+  info.className = 'sw-card-info';
+  info.innerHTML = `
+    <div class="sw-row1">
+      <span class="sw-order">${s.order}</span>
+      <span class="sw-name">${esc(s.name)}</span>
+      ${s.dharma ? `<span class="sw-dharma">${esc(s.dharma)}</span>` : ''}
+      ${phoneHtml}
+    </div>
+    <div class="sw-row2">
+      ${tagHtml(s)}
+      <span class="sw-badge-wrap">
+        ${fr  ? '<span class="badge badge-frozen">❄ 凍結</span>'
+        : pr  ? '<span class="badge badge-present">已到</span>'
+              : '<span class="badge badge-none">未到</span>'}
+      </span>
+      ${timeStr}
+    </div>`;
+  outer.appendChild(info);
+
+  const actionRow = document.createElement('div');
+  actionRow.className = 'sw-action-row';
+  if(!fr){
+    if(!pr){
+      const btn = makeHoldBtn('hb-checkin', '✅', `按三秒\n${ROUND_NAMES[currentRound]}報到`);
+      attachHold(btn, () => doPresent(key, selfMode, outer));
+      actionRow.appendChild(btn);
+    } else {
+      const btn = makeHoldBtn('hb-undo', '↩', '按三秒\n取消報到');
+      attachHold(btn, () => doUndo(key, selfMode, outer));
+      actionRow.appendChild(btn);
+    }
+  } else {
+    actionRow.appendChild(makeHoldBtn('hb-disabled', '🔒', '已凍結\n無法報到'));
+  }
+  if(!selfMode){
+    const fb = makeHoldBtn('hb-freeze' + (fr?' is-frozen':''), '❄', fr?'按三秒\n解凍此人':'按三秒\n凍結此人');
+    attachHold(fb, () => toggleFreeze(key));
+    actionRow.appendChild(fb);
+  }
+  outer.appendChild(actionRow);
+  return outer;
+}
+
+function makeHoldBtn(cls, icon, label){
+  const btn = document.createElement('button');
+  btn.className = 'hold-btn ' + cls;
+  const prog = document.createElement('div');
+  prog.className = 'hold-progress';
+  btn.appendChild(prog);
+  const content = document.createElement('div');
+  content.className = 'hb-content';
+  content.innerHTML = `<span class="hb-icon">${icon}</span><span class="hb-label">${label.replace('\n','<br>')}</span>`;
+  btn.appendChild(content);
+  return btn;
+}
+
+function doPresent(key, selfMode, outer){
+  data.statuses[currentRound][key] = { t: new Date().toLocaleTimeString('zh-TW',{hour12:false,hour:'2-digit',minute:'2-digit'}), src: selfMode?'self':'leader' };
+  triggerVibrate(); renderStats(); renderCards(); buildJumpSelect('jump-home');
+  rebuildCard(key, selfMode, outer);
+  if(isLeader) buildJumpSelect('jump-leader');
+  if(selfMode){
+    showToast(`✅ ${selfStudent?selfStudent.name:''} ${ROUND_NAMES[currentRound]}報到成功！`);
+    setTimeout(() => closeCardSelfSheet(), 900);
+  } else { showToast('✅ 已報到！'); }
+  apiCall({ action: 'checkin', round: currentRound, key: key, source: selfMode?'self':'leader' })
+    .catch(() => showToast('⚠ 同步失敗'));
+}
+function doUndo(key, selfMode, outer){
+  delete data.statuses[currentRound][key];
+  triggerVibrate(); renderStats(); renderCards(); buildJumpSelect('jump-home');
+  rebuildCard(key, selfMode, outer);
+  if(isLeader) buildJumpSelect('jump-leader');
+  showToast('↩ 已復原為未到');
+  apiCall({ action: 'resetOne', round: currentRound, key: key }).catch(() => showToast('⚠ 同步失敗'));
+}
+function rebuildCard(key, selfMode, oldOuter){
+  const s = data.students.find(s => s.key === key);
+  if(!s || !oldOuter || !oldOuter.parentNode) return;
+  oldOuter.parentNode.replaceChild(buildActionCard(s, selfMode), oldOuter);
+}
+
+// ── 卡片點擊自助報到 ──
+function openCardSelfSheet(key){
+  if(!selfCheckinEnabled){ showToast('⛔ 自助報到已關閉'); return; }
+  const s = data.students.find(s => s.key === key);
+  if(!s) return;
+  selfStudent = s;
+  document.getElementById('self-sheet-title').textContent = '🙋 自助報到（' + ROUND_NAMES[currentRound] + '）';
+  const area = document.getElementById('card-action-area');
+  area.innerHTML = '';
+  area.appendChild(buildActionCard(s, true));
+  document.getElementById('card-self-sheet').classList.add('show');
+}
+function closeCardSelfSheet(){
+  document.getElementById('card-self-sheet').classList.remove('show');
+}
+
+// ── 領隊 Sheet ──
+function openLeaderSheet(){
+  if(isLeader){
+    document.getElementById('leader-login-panel').classList.add('hidden');
+    document.getElementById('leader-panel').classList.remove('hidden');
+    renderStats(); renderCheckinList(); buildJumpSelect('jump-leader'); renderSelfToggle();
+  } else {
+    document.getElementById('leader-login-panel').classList.remove('hidden');
+    document.getElementById('leader-panel').classList.add('hidden');
+    document.getElementById('leader-pin-input').value = '';
+    document.getElementById('leader-login-err').textContent = '';
+    const btn = document.getElementById('leader-pin-submit');
+    btn.disabled = true; btn.className = 'pin-submit';
+  }
+  document.getElementById('leader-sheet').classList.add('show');
+  if(!isLeader) setTimeout(()=>document.getElementById('leader-pin-input').focus(), 120);
+}
+function closeLeaderSheet(){
+  document.getElementById('leader-sheet').classList.remove('show');
+  document.getElementById('back-to-top').classList.remove('show');
+}
+function onLeaderPinInput(el){
+  el.value = el.value.replace(/\D/g,'').slice(0,4);
+  document.getElementById('leader-login-err').textContent = '';
+  const ready = el.value.length >= 4;
+  const btn = document.getElementById('leader-pin-submit');
+  btn.disabled = !ready; btn.className = 'pin-submit' + (ready?' ready':'');
+}
+function doLeaderLogin(){
+  const val = document.getElementById('leader-pin-input').value;
+  if(val === LEADER_CODE){
+    isLeader = true;
+    document.getElementById('leader-login-err').textContent = '';
+    document.getElementById('leader-login-panel').classList.add('hidden');
+    document.getElementById('leader-panel').classList.remove('hidden');
+    renderSelfToggle();
+    leaderRefresh();
+  } else {
+    document.getElementById('leader-login-err').textContent = '⚠ 代碼錯誤';
+    document.getElementById('leader-pin-input').value = '';
+    const btn = document.getElementById('leader-pin-submit');
+    btn.disabled = true; btn.className = 'pin-submit';
+  }
+}
+function leaderLogout(){
+  isLeader = false;
+  document.getElementById('leader-panel').classList.add('hidden');
+  document.getElementById('leader-login-panel').classList.remove('hidden');
+  closeLeaderSheet(); showToast('已退出領隊後台');
+}
+async function leaderRefresh(){
+  await loadData(); renderStats(); renderCheckinList();
+  buildJumpSelect('jump-leader'); renderSelfToggle(); showToast('✅ 已同步');
+}
+
+function renderSelfToggle(){
+  const b = document.getElementById('self-toggle-btn');
+  b.textContent = selfCheckinEnabled ? '🔓 自助報到：開啟中（點此關閉）' : '🔒 自助報到：已關閉（點此開啟）';
+}
+async function toggleSelfCheckin(){
+  const next = !selfCheckinEnabled;
+  setLoading(true);
+  try {
+    const r = await apiCall({ action: 'setSelf', on: next ? '1' : '0', code: LEADER_CODE });
+    if(r && r.ok){
+      selfCheckinEnabled = next;
+      renderMain(); renderSelfToggle();
+      showToast(next ? '✅ 自助報到已開啟' : '🔒 自助報到已關閉');
+    } else showToast('⚠ ' + (r.msg || '設定失敗'));
+  } catch(e){ showToast('⚠ 設定失敗'); }
+  setLoading(false);
+}
+
+function renderCheckinList(){
+  const container = document.getElementById('checkin-list');
+  container.innerHTML = '';
+  eligibleStudents().sort((a,b)=>Number(a.order)-Number(b.order))
+    .forEach(s => container.appendChild(buildActionCard(s, false)));
+}
+
+async function toggleFreeze(key){
+  const fr = isFrozen(key);
+  setLoading(true);
+  try {
+    if(fr){
+      await Promise.all([
+        apiCall({ action: 'unfreezeOne', key: key, code: LEADER_CODE }),
+        apiCall({ action: 'resetOne', round: currentRound, key: key })
+      ]);
+      data.frozen = data.frozen.filter(f => f !== key);
+      delete data.statuses[currentRound][key];
+      showToast('🔓 已解凍・恢復未到狀態');
+    } else {
+      await apiCall({ action: 'freezeOne', key: key, code: LEADER_CODE });
+      data.frozen.push(key);
+      showToast('❄ 已凍結・不計入應到人數');
+    }
+    renderStats(); renderCards(); renderCheckinList();
+    buildJumpSelect('jump-home'); buildJumpSelect('jump-leader');
+  } catch(e){ showToast('⚠ 操作失敗'); }
+  setLoading(false);
+}
+
+async function clearAllData(){
+  if(!confirm('確定清除本車（' + CAR + '）三輪所有點名記錄與凍結設定？\n此操作無法復原，請確認。')) return;
+  if(!confirm('⚠ 再次確認：清除後本車所有人回到未到、無凍結的空白狀態。\n確定清除？')) return;
+  setLoading(true);
+  try {
+    await apiCall({ action: 'clearStatus', code: LEADER_CODE });
+    data.statuses = { go:{}, back:{}, off:{} };
+    data.frozen = [];
+    renderStats(); renderCards(); renderCheckinList();
+    buildJumpSelect('jump-home'); buildJumpSelect('jump-leader');
+    showToast('🗑 已清除本車所有點名記錄');
+  } catch(e){ showToast('⚠ 清除失敗'); }
+  setLoading(false);
+}
+
+document.getElementById('card-self-sheet').addEventListener('click', function(e){ if(e.target===this) closeCardSelfSheet(); });
+document.getElementById('leader-sheet').addEventListener('click', function(e){ if(e.target===this) closeLeaderSheet(); });
+
+document.getElementById('leader-sheet').addEventListener('scroll', function(){
+  const sheet = this.querySelector('.modal-sheet');
+  const btn = document.getElementById('back-to-top');
+  if(sheet && sheet.scrollTop > 120) btn.classList.add('show');
+  else btn.classList.remove('show');
+}, true);
+document.getElementById('back-to-top').onclick = function(){
+  const sheet = document.querySelector('#leader-sheet .modal-sheet');
+  if(sheet) sheet.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+window.onload = async () => {
+  isReadonly = (window.location.hash === '#readonly');
+  if(!CAR){ showErr('請由各車專屬連結進入<br>例如：<b>?car=A1</b>'); return; }
+  document.getElementById('page-title').textContent = '☸ ' + CAR + ' 車出車點名';
+  document.getElementById('footer').textContent = 'AQE@2026 · 出車點名 · ' + CAR + ' 車';
+  document.title = CAR + ' 車出車點名';
+  setRound('go');
+  await loadData();
+  renderMain();
+  setInterval(async () => { await loadData(); renderMain(); if(isLeader){ renderCheckinList(); buildJumpSelect('jump-leader'); } }, 30000);
+};
+</script>
+</body>
+</html>
