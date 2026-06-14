@@ -479,9 +479,10 @@ function leaderLogin(){
   api({ action:'login', phone }).then(d => {
     if (!d.ok) { err.textContent = d.msg; err.className = 'pin-error'; return; }
     Object.assign(S, { role:d.role, name:d.name, car:d.car, cars:d.cars,
-                       roster:d.roster, sheetUrl:d.sheetUrl || '' });
-    $('page-title').textContent = '☸ ' + S.car + ' 車異動申請' + (d.eventName ? '　' + d.eventName : '');
+                       roster:d.roster, sheetUrl:d.sheetUrl || '', eventName:d.eventName || '' });
+    $('page-title').textContent = (S.eventName ? S.eventName + '　' : '') + '☸ ' + S.car + ' 車異動申請';
     $('logout-btn').classList.add('show');
+    $('admin-gear').classList.add('hidden');
     $('login-view').classList.add('hidden');
     $('leader-view').classList.remove('hidden');
     renderRoster(); loadMyRequests();
@@ -504,8 +505,8 @@ function adminLogin(){
   api({ action:'adminLogin', code }).then(d => {
     if (!d.ok) { err.textContent = d.msg; err.className = 'form-msg err'; return; }
     closeAdminSheet();
-    S.adminCode = code; S.cars = d.cars;
-    $('page-title').textContent = '☸ 異動審核管理' + (d.eventName ? '　' + d.eventName : '');
+    S.adminCode = code; S.cars = d.cars; S.eventName = d.eventName || '';
+    $('page-title').textContent = (S.eventName ? S.eventName + '　' : '') + '☸ 異動審核管理';
     $('logout-btn').classList.add('show');
     $('admin-gear').classList.add('hidden');
     $('login-view').classList.add('hidden');
