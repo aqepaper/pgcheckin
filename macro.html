@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>法會合併派車系統：完整說明文件</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700&family=LXGW+WenKai+TC&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F7F4EE;
+    --card: #FFFFFF;
+    --ink: #1E1A14;
+    --gold: #A8832A;
+    --gold-light: #F0E8D0;
+    --gold-mid: #D4AA5A;
+    --gray: #6B6357;
+    --gray-light: #E8E4DC;
+    --red: #8B3A2A;
+    --green: #2A5C3A;
+    --serif: 'Noto Serif TC', 'Songti TC', serif;
+    --body: 'LXGW WenKai TC', 'Noto Serif TC', serif;
+    --mono: 'Courier Prime', 'Courier New', monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { font-size: 17px; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--body);
+    line-height: 1.85;
+    padding: 2.5rem 1.5rem 5rem;
+  }
+
+  .doc {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  /* ── Cover ── */
+  .cover {
+    padding: 3rem 0 2.5rem;
+    border-bottom: 2px solid var(--gold);
+    margin-bottom: 3rem;
+  }
+
+  .cover-eyebrow {
+    font-family: var(--serif);
+    font-size: 0.85rem;
+    letter-spacing: 0.18em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+
+  .cover h1 {
+    font-family: var(--serif);
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1.4;
+    color: var(--ink);
+    margin-bottom: 0.75rem;
+  }
+
+  .cover-sub {
+    font-size: 1.05rem;
+    color: var(--gray);
+    margin-bottom: 1.5rem;
+  }
+
+  .cover-meta {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .cover-meta span {
+    font-size: 0.9rem;
+    color: var(--gray);
+  }
+
+  .cover-meta strong {
+    color: var(--gold);
+    font-weight: 600;
+  }
+
+  /* ── TOC ── */
+  .toc {
+    background: var(--gold-light);
+    border-left: 4px solid var(--gold);
+    padding: 1.5rem 2rem;
+    margin-bottom: 3.5rem;
+    border-radius: 0 4px 4px 0;
+  }
+
+  .toc-title {
+    font-family: var(--serif);
+    font-size: 0.9rem;
+    letter-spacing: 0.12em;
+    color: var(--gold);
+    margin-bottom: 1rem;
+  }
+
+  .toc ol {
+    list-style: none;
+    counter-reset: toc-counter;
+    padding: 0;
+  }
+
+  .toc ol li {
+    counter-increment: toc-counter;
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    padding: 0.25rem 0;
+    font-size: 0.95rem;
+  }
+
+  .toc ol li::before {
+    content: counter(toc-counter, cjk-decimal) "．";
+    font-family: var(--serif);
+    color: var(--gold);
+    font-weight: 600;
+    flex-shrink: 0;
+    min-width: 2rem;
+  }
+
+  .toc a {
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  .toc a:hover { color: var(--gold); }
+
+  /* ── Chapter ── */
+  .chapter {
+    margin-bottom: 4rem;
+  }
+
+  .chapter-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.25rem;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--gray-light);
+  }
+
+  .chapter-num {
+    font-family: var(--serif);
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--gold);
+    line-height: 1;
+    flex-shrink: 0;
+    padding-top: 0.1rem;
+  }
+
+  .chapter-title {
+    font-family: var(--serif);
+    font-size: 1.45rem;
+    font-weight: 600;
+    color: var(--ink);
+    line-height: 1.4;
+  }
+
+  .chapter-desc {
+    font-size: 0.95rem;
+    color: var(--gray);
+    margin-top: 0.3rem;
+    line-height: 1.7;
+  }
+
+  /* ── Section ── */
+  .section {
+    margin-bottom: 2rem;
+  }
+
+  .section-title {
+    font-family: var(--serif);
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 0.9rem;
+    padding-left: 0.9rem;
+    border-left: 3px solid var(--gold-mid);
+  }
+
+  p {
+    margin-bottom: 1rem;
+    font-size: 1rem;
+  }
+
+  /* ── Cards ── */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--gray-light);
+    border-radius: 4px;
+    padding: 1.4rem 1.6rem;
+    margin-bottom: 1.2rem;
+  }
+
+  .card-title {
+    font-family: var(--serif);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--gold);
+    margin-bottom: 0.6rem;
+  }
+
+  /* ── Sheet Table ── */
+  .sheet-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+    margin-bottom: 1.2rem;
+  }
+
+  .sheet-table th {
+    background: var(--gold-light);
+    font-family: var(--serif);
+    font-weight: 600;
+    color: var(--gold);
+    text-align: left;
+    padding: 0.6rem 1rem;
+    border-bottom: 2px solid var(--gold-mid);
+  }
+
+  .sheet-table td {
+    padding: 0.6rem 1rem;
+    border-bottom: 1px solid var(--gray-light);
+    vertical-align: top;
+  }
+
+  .sheet-table tr:last-child td { border-bottom: none; }
+
+  .sheet-table tr:hover td { background: var(--gold-light); }
+
+  .tag {
+    display: inline-block;
+    background: var(--gold-light);
+    color: var(--gold);
+    font-size: 0.78rem;
+    padding: 0.1rem 0.5rem;
+    border-radius: 2px;
+    font-family: var(--serif);
+  }
+
+  /* ── Steps ── */
+  .steps {
+    list-style: none;
+    padding: 0;
+    counter-reset: step-counter;
+  }
+
+  .steps li {
+    counter-increment: step-counter;
+    display: grid;
+    grid-template-columns: 2.4rem 1fr;
+    gap: 0.8rem;
+    margin-bottom: 1.4rem;
+    align-items: start;
+  }
+
+  .steps li::before {
+    content: counter(step-counter);
+    background: var(--gold);
+    color: white;
+    font-family: var(--serif);
+    font-weight: 700;
+    font-size: 0.9rem;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 0.1rem;
+  }
+
+  .step-body strong {
+    display: block;
+    font-family: var(--serif);
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+  }
+
+  .step-body p {
+    font-size: 0.97rem;
+    margin-bottom: 0;
+  }
+
+  /* ── Code ── */
+  code {
+    font-family: var(--mono);
+    font-size: 0.88rem;
+    background: var(--gold-light);
+    color: var(--red);
+    padding: 0.1rem 0.4rem;
+    border-radius: 2px;
+  }
+
+  /* ── Pros / Cons ── */
+  .pro-con {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.2rem;
+  }
+
+  @media (max-width: 600px) {
+    .pro-con { grid-template-columns: 1fr; }
+  }
+
+  .pro-box, .con-box {
+    padding: 1.2rem 1.4rem;
+    border-radius: 4px;
+  }
+
+  .pro-box {
+    background: #EBF4EF;
+    border-left: 3px solid var(--green);
+  }
+
+  .con-box {
+    background: #F9EDED;
+    border-left: 3px solid var(--red);
+  }
+
+  .pro-box .box-title { color: var(--green); }
+  .con-box .box-title { color: var(--red); }
+
+  .box-title {
+    font-family: var(--serif);
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    margin-bottom: 0.8rem;
+  }
+
+  .box-list {
+    list-style: none;
+    padding: 0;
+  }
+
+  .box-list li {
+    font-size: 0.95rem;
+    padding: 0.3rem 0;
+    padding-left: 1.2rem;
+    position: relative;
+    line-height: 1.7;
+  }
+
+  .pro-box .box-list li::before {
+    content: "✓";
+    color: var(--green);
+    position: absolute;
+    left: 0;
+    font-weight: 700;
+  }
+
+  .con-box .box-list li::before {
+    content: "✗";
+    color: var(--red);
+    position: absolute;
+    left: 0;
+    font-weight: 700;
+  }
+
+  /* ── Callout ── */
+  .callout {
+    border-left: 4px solid var(--gold);
+    background: var(--gold-light);
+    padding: 1rem 1.4rem;
+    margin: 1.2rem 0;
+    border-radius: 0 4px 4px 0;
+    font-size: 0.97rem;
+  }
+
+  .callout-warn {
+    border-left-color: var(--red);
+    background: #F9EDED;
+  }
+
+  /* ── Improve Table ── */
+  .improve-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.93rem;
+  }
+
+  .improve-table th {
+    background: var(--gold-light);
+    font-family: var(--serif);
+    color: var(--gold);
+    text-align: left;
+    padding: 0.6rem 1rem;
+    border-bottom: 2px solid var(--gold-mid);
+    font-weight: 600;
+  }
+
+  .improve-table td {
+    padding: 0.7rem 1rem;
+    border-bottom: 1px solid var(--gray-light);
+    vertical-align: top;
+    line-height: 1.7;
+  }
+
+  .improve-table tr:last-child td { border-bottom: none; }
+
+  .phase-tag {
+    display: inline-block;
+    font-family: var(--serif);
+    font-size: 0.78rem;
+    padding: 0.15rem 0.6rem;
+    border-radius: 2px;
+    font-weight: 600;
+  }
+
+  .phase-short { background: #EBF4EF; color: var(--green); }
+  .phase-mid { background: var(--gold-light); color: var(--gold); }
+  .phase-long { background: #EDE8F9; color: #4A3A8A; }
+
+  /* ── Footer ── */
+  .doc-footer {
+    margin-top: 4rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--gray-light);
+    font-size: 0.85rem;
+    color: var(--gray);
+    text-align: center;
+    line-height: 1.8;
+  }
+
+  /* ── Print ── */
+  @media print {
+    body { background: white; padding: 0; font-size: 14px; }
+    .doc { max-width: 100%; }
+    .chapter { page-break-inside: avoid; }
+    .card { border: 1px solid #ccc; box-shadow: none; }
+    .toc { background: #f5f0e8; }
+    .pro-box { background: #f0f7f3; }
+    .con-box { background: #fdf2f2; }
+    .callout { background: #f5f0e8; }
+  }
+</style>
+</head>
+<body>
+<div class="doc">
+
+  <!-- Cover -->
+  <header class="cover">
+    <div class="cover-eyebrow">普高精舍 · 技術說明文件</div>
+    <h1>法會合併派車系統<br>完整說明文件</h1>
+    <p class="cover-sub">以 Excel VBA 巨集為核心的人工派車管理工具</p>
+    <div class="cover-meta">
+      <span><strong>檔案</strong> 法會合併-空白檔.xlsm</span>
+      <span><strong>工作表</strong> 共 12 張</span>
+      <span><strong>適用</strong> 法師、執秘、志工主任</span>
+    </div>
+  </header>
+
+  <!-- TOC -->
+  <nav class="toc">
+    <div class="toc-title">目　錄</div>
+    <ol>
+      <li><a href="#ch1">系統整體架構</a></li>
+      <li><a href="#ch2">巨集的運作邏輯與技術細節</a></li>
+      <li><a href="#ch3">完整操作流程</a></li>
+      <li><a href="#ch4">系統的限制與改善建議</a></li>
+      <li><a href="#ch5">整體設計脈絡與評價</a></li>
+    </ol>
+  </nav>
+
+  <!-- Chapter 1 -->
+  <section class="chapter" id="ch1">
+    <div class="chapter-header">
+      <div class="chapter-num">一</div>
+      <div>
+        <div class="chapter-title">系統整體架構</div>
+        <div class="chapter-desc">十二張工作表的分工與資料流向</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <p>這是一個以 <strong>Excel VBA 巨集</strong>驅動的半自動派車管理系統。核心資料源是一份外部信眾資料庫（<code>全部信眾資料.XLS</code>），透過 <code>INDEX+MATCH</code> 公式拉入本活動名單，再由巨集將人員分派至各車次出車表。</p>
+    </div>
+
+    <div class="section">
+      <div class="section-title">十二張工作表一覽</div>
+      <table class="sheet-table">
+        <thead>
+          <tr>
+            <th>工作表名稱</th>
+            <th>功能說明</th>
+            <th>性質</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>使用手冊</strong></td>
+            <td>公式原理說明、欄位注意事項、常見錯誤排除</td>
+            <td><span class="tag">參考</span></td>
+          </tr>
+          <tr>
+            <td><strong>作業說明</strong></td>
+            <td>操作步驟 SOP，四個作業步驟的簡明指引</td>
+            <td><span class="tag">參考</span></td>
+          </tr>
+          <tr>
+            <td><strong>總名單</strong></td>
+            <td>本次活動所有參加者的核心資料表，所有工作表的資料來源</td>
+            <td><span class="tag">核心</span></td>
+          </tr>
+          <tr>
+            <td><strong>基本資料</strong></td>
+            <td>設定本次出車數量、各車司機姓名、車牌、手機號碼</td>
+            <td><span class="tag">輸入</span></td>
+          </tr>
+          <tr>
+            <td><strong>出車表B</strong></td>
+            <td>大型交通車乘客名冊（包含去/回程人員、領隊、聯絡資訊）</td>
+            <td><span class="tag">輸出</span></td>
+          </tr>
+          <tr>
+            <td><strong>大車出車表</strong></td>
+            <td>另一格式的大車出車表，各車欄位可自訂不同</td>
+            <td><span class="tag">輸出</span></td>
+          </tr>
+          <tr>
+            <td><strong>當天小車</strong></td>
+            <td>搭小型自用車或自行前往者的名冊</td>
+            <td><span class="tag">輸出</span></td>
+          </tr>
+          <tr>
+            <td><strong>查詢表</strong></td>
+            <td>輸入姓名即可查詢該人的去/回程車次、班別、義工組別</td>
+            <td><span class="tag">工具</span></td>
+          </tr>
+          <tr>
+            <td><strong>保險表總明細</strong></td>
+            <td>自動匯總所有參加者的姓名、身份證號、出生日，統計總人數</td>
+            <td><span class="tag">輸出</span></td>
+          </tr>
+          <tr>
+            <td><strong>保險表</strong></td>
+            <td>依保險公司格式分組輸出的保險申報分表</td>
+            <td><span class="tag">輸出</span></td>
+          </tr>
+          <tr>
+            <td><strong>活動排序A</strong></td>
+            <td>單一條件篩選輸出（如依性別、班別、義工組別）</td>
+            <td><span class="tag">工具</span></td>
+          </tr>
+          <tr>
+            <td><strong>活動排序B</strong></td>
+            <td>同上，提供第二組篩選條件</td>
+            <td><span class="tag">工具</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout">
+      <strong>資料流向簡述：</strong>外部信眾資料庫 → 總名單（人工填入車次）→ 執行巨集 → 各出車表、保險表自動生成。總名單是唯一可以增刪行列的工作表，其餘工作表結構固定。
+    </div>
+  </section>
+
+  <!-- Chapter 2 -->
+  <section class="chapter" id="ch2">
+    <div class="chapter-header">
+      <div class="chapter-num">二</div>
+      <div>
+        <div class="chapter-title">巨集的運作邏輯與技術細節</div>
+        <div class="chapter-desc">按下按鈕後，系統實際做了什麼</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">巨集的核心任務</div>
+      <p>巨集（VBA）做的事只有一件：<strong>把總名單裡的人，依照他們填寫的車次號碼，分別複製到對應的出車表格子裡</strong>，然後自動計算每輛車的去程與回程人數。</p>
+    </div>
+
+    <div class="section">
+      <div class="section-title">執行時的完整步驟</div>
+      <ul class="steps">
+        <li>
+          <div class="step-body">
+            <strong>讀取基本資料</strong>
+            <p>得知本次出幾部車（A欄填了幾格就出幾張表）、各車的司機、車牌、手機號碼。</p>
+          </div>
+        </li>
+        <li>
+          <div class="step-body">
+            <strong>清空所有出車表的舊資料</strong>
+            <p>避免上次活動的人員資料殘留在表格中，造成混淆。</p>
+          </div>
+        </li>
+        <li>
+          <div class="step-body">
+            <strong>逐列掃描總名單</strong>
+            <p>對每一位參加者，讀取 B 欄（去程車次）與 C 欄（回程車次）的數字，依數字找到對應的出車表欄位，將該人的完整資料複製過去。</p>
+          </div>
+        </li>
+        <li>
+          <div class="step-body">
+            <strong>計算各車人數</strong>
+            <p>完成後依進階篩選公式自動統計每車去程人數與回程人數，填入各出車表的表頭欄位。</p>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <div class="section-title">幾個常見疑問</div>
+
+      <div class="card">
+        <div class="card-title">為什麼執行時螢幕會快速閃爍？</div>
+        <p>巨集在複製資料時，必須不斷在「總名單」和各「出車表」之間切換工作表，每次切換畫面都會重繪，所以看到螢幕快速閃爍。這是正常現象，不是電腦故障。</p>
+      </div>
+
+      <div class="card">
+        <div class="card-title">領隊代號是怎麼自動帶出的？</div>
+        <p>E 欄的領隊代號是公式自動對照 D 欄的執事名稱產生的，對照表如下：法師＝1、總召＝2、執秘＝3、大隊長＝4、中隊長＝5、副中隊長＝6、領隊＝7、副領隊＝7。巨集執行時再以這個數字欄做排序依據，讓出車表呈現「領隊優先、同車關係人相鄰、去程相同」的排列順序。</p>
+      </div>
+
+      <div class="card">
+        <div class="card-title">為什麼不能插入或刪除行列？</div>
+        <p>巨集程式碼是用<strong>固定的欄號與列號</strong>定位資料，例如寫死「從第4列開始、姓名在第8欄」。一旦人工插入或刪除了一列或一欄，程式的座標就全部錯位，輕則資料貼錯位置，重則直接跳出 VBA 錯誤視窗當機。多餘不用的欄列請用「隱藏」取代「刪除」。</p>
+      </div>
+
+      <div class="card">
+        <div class="card-title">公式為什麼要連結外部 XLS 檔？</div>
+        <p>總名單有一部分欄位（如姓名、法名、班別、電話）是透過 <code>INDEX+MATCH</code> 公式從 <code>全部信眾資料.XLS</code> 比對身份證號後自動帶入的，避免重複人工鍵入。這份外部檔案若路徑改變，公式即出現 <code>#REF!</code> 錯誤，需手動重新建立連結。</p>
+      </div>
+    </div>
+
+    <div class="callout callout-warn">
+      <strong>特別注意：欄位名稱空格敏感。</strong>「三皈」與「三&nbsp;皈」對程式是不同字串。手工輸入的欄位名稱若有多打或少打一個空格，巨集就會找不到對應欄位而當機。建議一律用「複製貼上」，不要手打欄位名稱。
+    </div>
+  </section>
+
+  <!-- Chapter 3 -->
+  <section class="chapter" id="ch3">
+    <div class="chapter-header">
+      <div class="chapter-num">三</div>
+      <div>
+        <div class="chapter-title">完整操作流程</div>
+        <div class="chapter-desc">志工如何一步步完成派車作業</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">前置準備</div>
+      <p>開始前，需確認電腦上有 <code>全部信眾資料.XLS</code>（中台信眾總資料庫），並與本檔放在相同路徑位置，公式才能正常連結取得信眾基本資料。</p>
+    </div>
+
+    <div class="section">
+      <div class="section-title">作業一：整理總名單</div>
+      <div class="card">
+        <ul class="box-list" style="list-style: none; padding: 0;">
+          <li style="padding: 0.4rem 0; border-bottom: 1px solid var(--gray-light);">A 到 E 欄<strong>不能動</strong>（編號、去程、回程、執事、領隊代號）</li>
+          <li style="padding: 0.4rem 0; border-bottom: 1px solid var(--gray-light);">將中台匯出的信眾資料從 <strong>F 欄起整欄貼入</strong>（貼上數值，避免帶入外部格式）</li>
+          <li style="padding: 0.4rem 0; border-bottom: 1px solid var(--gray-light);">手工填寫 <strong>B 欄（去程車次）</strong>：填數字「1」代表第一車、「2」第二車，填「自行」代表自行前往</li>
+          <li style="padding: 0.4rem 0; border-bottom: 1px solid var(--gray-light);">手工填寫 <strong>C 欄（回程車次）</strong>：去回程車次可以不同</li>
+          <li style="padding: 0.4rem 0;">手工填寫 <strong>D 欄（執事身份）</strong>：如「領隊」、「副領隊」、「執秘」等，E欄自動帶出數字代號</li>
+        </ul>
+      </div>
+      <div class="callout callout-warn">
+        這個步驟是<strong>全系統最費工的環節</strong>。需要志工對照報名資料，逐一手動分配每個人搭哪輛車，沒有任何自動化輔助，完全依賴人工判斷。
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">作業二：設定大車出車表欄位</div>
+      <p>在大車出車表的第一列，從總名單<strong>複製</strong>（不要手打）需要顯示的欄位名稱，例如：姓名、法名、班別、電話、身份證號。每一部車的欄位可以各自不同，例如第一車需要顯示桌號，其他車不需要。</p>
+    </div>
+
+    <div class="section">
+      <div class="section-title">作業三：填寫基本資料</div>
+      <div class="card">
+        <ul class="box-list" style="list-style: none; padding: 0;">
+          <li style="padding: 0.4rem 0; border-bottom: 1px solid var(--gray-light);"><strong>A 欄</strong>：填幾格就代表出幾部車（例如出3部車就填3格），多填會多生出空表，少填會少出表</li>
+          <li style="padding: 0.4rem 0;">後續欄位依序填入各車的<strong>司機姓名、車牌號碼、司機手機</strong></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">作業四：執行巨集</div>
+      <p>在「基本資料」工作表找到「<strong>出車表</strong>」按鈕，點擊執行。等待螢幕閃爍完成（資料量約需數十秒）。巨集完成後，各車出車表即自動生成，表頭自動顯示去程人數與回程人數。</p>
+    </div>
+
+    <div class="section">
+      <div class="section-title">事後查核與列印</div>
+      <div class="card">
+        <div class="card-title">個人查核</div>
+        <p>用「查詢表」輸入個別姓名，確認該人的去程／回程車次是否正確。</p>
+      </div>
+      <div class="card">
+        <div class="card-title">保險申報</div>
+        <p>用「保險表總明細」確認保險總人數是否與預期相符，然後列印各分表送保險公司。列印前請設定列印範圍，避免列印空白分表。</p>
+      </div>
+      <div class="card">
+        <div class="card-title">分組子名單</div>
+        <p>如需依特定條件（如義工組別、性別）篩出子名單，在「活動排序A/B」的 A1 儲存格填入欄位名稱、A2 填入篩選條件後，執行篩選巨集。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Chapter 4 -->
+  <section class="chapter" id="ch4">
+    <div class="chapter-header">
+      <div class="chapter-num">四</div>
+      <div>
+        <div class="chapter-title">系統的限制與改善建議</div>
+        <div class="chapter-desc">現有痛點及各階段的升級方向</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">現有限制</div>
+      <div class="pro-con">
+        <div class="pro-box">
+          <div class="box-title">✓ 設計優點</div>
+          <ul class="box-list">
+            <li>使用手冊與作業說明詳盡，交接成本低</li>
+            <li>保險申報表整合進系統，減少獨立作業</li>
+            <li>「同車」欄支援親眷或關係人連帶</li>
+            <li>去程、回程可分別指定不同車次</li>
+            <li>巨集自動計算各車人數，減少加總錯誤</li>
+            <li>查詢表可即時核對個人車次</li>
+          </ul>
+        </div>
+        <div class="con-box">
+          <div class="box-title">✗ 現有限制</div>
+          <ul class="box-list">
+            <li>分車完全人工，無自動平衡機制</li>
+            <li>連結外部 XLS 路徑，換電腦即出錯</li>
+            <li>欄位名稱空格差異會導致當機</li>
+            <li>單機架構，無法多人同時協作</li>
+            <li>車次上限固定（最多四十車）</li>
+            <li>錯誤訊息為英文，志工難以判斷原因</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">改善建議</div>
+      <table class="improve-table">
+        <thead>
+          <tr>
+            <th>階段</th>
+            <th>建議內容</th>
+            <th>預期效益</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="phase-tag phase-short">短期</span></td>
+            <td>在總名單 B/C 欄加入資料驗證下拉選單，限制只能選「1～N」或「自行」</td>
+            <td>避免手誤打錯格式導致巨集找不到資料</td>
+          </tr>
+          <tr>
+            <td><span class="phase-tag phase-short">短期</span></td>
+            <td>在基本資料加入各車即時人數顯示（用 COUNTIF 計算）</td>
+            <td>邊分車邊看負載，避免某車爆滿而不自知</td>
+          </tr>
+          <tr>
+            <td><span class="phase-tag phase-short">短期</span></td>
+            <td>加入巨集執行前的資料完整性檢查，若有人未填車次則彈出中文警告</td>
+            <td>提前發現漏填，減少事後補救</td>
+          </tr>
+          <tr>
+            <td><span class="phase-tag phase-mid">中期</span></td>
+            <td>將總名單移至 Google Sheets，改用 Google Apps Script 取代 VBA 巨集</td>
+            <td>解除單機與路徑依賴，多位志工可同時在線上編輯</td>
+          </tr>
+          <tr>
+            <td><span class="phase-tag phase-mid">中期</span></td>
+            <td>以 GAS 後台產生出車表與保險表，輸出為 PDF 直接列印</td>
+            <td>不再需要安裝 Excel，任何裝置皆可操作</td>
+          </tr>
+          <tr>
+            <td><span class="phase-tag phase-long">長期</span></td>
+            <td>加入自動分車建議演算法：依各車載客上限、性別分艙等條件自動提出初始分配，志工再微調</td>
+            <td>大幅減少人工分車時間，降低遺漏風險</td>
+          </tr>
+          <tr>
+            <td><span class="phase-tag phase-long">長期</span></td>
+            <td>結合報名系統，信眾報名時選擇搭車意願，資料直接流入派車系統</td>
+            <td>消除人工二次輸入，資料從源頭即準確</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Chapter 5 -->
+  <section class="chapter" id="ch5">
+    <div class="chapter-header">
+      <div class="chapter-num">五</div>
+      <div>
+        <div class="chapter-title">整體設計脈絡與評價</div>
+        <div class="chapter-desc">這個系統為什麼長成這樣，本質是什麼</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">為什麼會長成這樣</div>
+      <p>這個系統是在<strong>資源有限、操作者為義工</strong>的條件下，歷經多次法會實際使用後不斷修補痛點演化而來，並非一次性設計完成。從使用手冊的細緻程度、各工作表的保護設計、以及「活動排序A/B」這類彈性輔助工具，都可以看出長期迭代的痕跡。</p>
+    </div>
+
+    <div class="section">
+      <div class="section-title">系統的核心本質</div>
+      <div class="callout">
+        這個系統的本質是：<strong>「把人工決策的結果，自動化輸出成報表」</strong>，而不是「讓系統幫你做決策」。
+      </div>
+      <p>分車這件最核心、最費工的事，仍然完全仰賴熟悉活動的志工主任的人際判斷與經驗——誰要跟誰同車、誰有特殊需求、哪車需要多一個領隊——這些都是電腦目前無法取代的部分。</p>
+      <p>系統的價值在於：這些決策一旦輸入完成，後續的報表產出、人數統計、保險整理就全部自動完成，不需要再手工重複抄寫，大幅降低出錯機率。</p>
+    </div>
+
+    <div class="section">
+      <div class="section-title">值得特別肯定的設計細節</div>
+      <div class="card">
+        <div class="card-title">去回程分離設計</div>
+        <p>允許去程、回程搭不同車，對跨日活動（如八關齋戒12/31～1/1）特別重要。參加者可以去程搭第一車，回程因個人行程不同改搭第四車，系統完整支援這種彈性。</p>
+      </div>
+      <div class="card">
+        <div class="card-title">親眷同車邏輯</div>
+        <p>「同車」欄記錄親眷跟隨的主要聯絡人姓名，讓家庭成員或關係人可以被綁定在同一欄位。在出車表中可清楚看出哪些人是連帶同行，方便領隊點名確認。</p>
+      </div>
+      <div class="card">
+        <div class="card-title">保險流程整合</div>
+        <p>保險申報表直接整合進派車系統，從總名單自動拉取姓名、身份證號、出生日，並自動統計總人數、分組輸出分表，減少一道獨立手工作業，是務實而貼近實際需求的設計。</p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="doc-footer">
+    <p>本文件依據 法會合併-空白檔.xlsm 分析整理 · 普高精舍派車系統說明</p>
+  </footer>
+
+</div>
+</body>
+</html>
