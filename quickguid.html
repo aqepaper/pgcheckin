@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DVSS 系統說明書 — 普高精舍 115年供佛齋僧法會</title>
+<style>
+/* ── Reset & Base ─────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --navy:  #1a3a5c;
+  --blue:  #2563a8;
+  --sky:   #4a90d9;
+  --teal:  #0e7a6e;
+  --gold:  #b8860b;
+  --sand:  #f5efe0;
+  --ink:   #222222;
+  --muted: #666666;
+  --rule:  #d0d0d0;
+  --bg:    #ffffff;
+  --m1:    #2563a8;   /* 模組1藍 */
+  --m2:    #0e7a6e;   /* 模組2青 */
+  --m3:    #c05c10;   /* 模組3橙 */
+  --m4:    #7030a0;   /* 模組4紫 */
+  --cap: 600px;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+  font-size: 16px;
+  line-height: 1.7;
+  color: var(--ink);
+  background: #f0f2f5;
+}
+
+/* ── Container ────────────────────────────────────── */
+.wrap {
+  max-width: var(--cap);
+  margin: 0 auto;
+  background: var(--bg);
+  min-height: 100vh;
+  box-shadow: 0 0 32px rgba(0,0,0,.12);
+}
+
+/* ── Cover ────────────────────────────────────────── */
+.cover {
+  background: var(--navy);
+  padding: 48px 24px 40px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.cover::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    -45deg,
+    transparent,
+    transparent 24px,
+    rgba(255,255,255,.03) 24px,
+    rgba(255,255,255,.03) 25px
+  );
+}
+.cover-temple {
+  font-size: 14px;
+  letter-spacing: 0.25em;
+  color: rgba(255,255,255,.55);
+  margin-bottom: 12px;
+  position: relative;
+}
+.cover-title {
+  font-size: 28px;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1.3;
+  letter-spacing: .04em;
+  position: relative;
+}
+.cover-sub {
+  font-size: 13px;
+  color: rgba(255,255,255,.45);
+  letter-spacing: .18em;
+  margin-top: 6px;
+  position: relative;
+}
+.cover-badge {
+  display: inline-block;
+  margin-top: 20px;
+  background: rgba(255,255,255,.1);
+  border: 1px solid rgba(255,255,255,.22);
+  border-radius: 6px;
+  padding: 10px 20px;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  position: relative;
+}
+.cover-event {
+  margin-top: 8px;
+  font-size: 13px;
+  color: rgba(255,255,255,.5);
+  position: relative;
+}
+
+/* ── Module Chips ─────────────────────────────────── */
+.mod-chips {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: rgba(255,255,255,.15);
+  margin-top: 28px;
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+}
+.chip {
+  padding: 12px 8px;
+  text-align: center;
+}
+.chip-num { font-size: 11px; opacity: .65; color: #fff; }
+.chip-name { font-size: 15px; font-weight: 700; color: #fff; margin-top: 2px; }
+.chip[data-m="1"] { background: var(--m1); }
+.chip[data-m="2"] { background: var(--m2); }
+.chip[data-m="3"] { background: var(--m3); }
+.chip[data-m="4"] { background: var(--m4); }
+
+/* ── Nav ──────────────────────────────────────────── */
+.toc {
+  background: var(--sand);
+  border-bottom: 2px solid var(--rule);
+  padding: 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.toc-scroll {
+  display: flex;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding: 0 8px;
+}
+.toc-scroll::-webkit-scrollbar { display: none; }
+.toc-link {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 14px;
+  text-decoration: none;
+  border-bottom: 3px solid transparent;
+  transition: border-color .2s;
+}
+.toc-link:hover, .toc-link.active { border-bottom-color: var(--blue); }
+.toc-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  margin-bottom: 4px;
+}
+.toc-label { font-size: 12px; color: var(--ink); white-space: nowrap; font-weight: 600; }
+
+/* ── Section ──────────────────────────────────────── */
+section { padding: 0 20px 32px; }
+section:first-of-type { padding-top: 28px; }
+
+.sec-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--rule);
+}
+.sec-icon {
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+.sec-title { font-size: 20px; font-weight: 800; color: var(--navy); }
+.sec-sub   { font-size: 13px; color: var(--muted); margin-top: 1px; }
+
+/* ── Sub-heading ──────────────────────────────────── */
+h3.sh {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--navy);
+  margin: 24px 0 10px;
+  padding-left: 10px;
+  border-left: 4px solid var(--blue);
+}
+
+/* ── Prose ────────────────────────────────────────── */
+p.prose {
+  font-size: 16px;
+  color: #333;
+  margin-bottom: 12px;
+  line-height: 1.75;
+}
+
+/* ── Info Table ───────────────────────────────────── */
+.info-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+  margin: 12px 0;
+}
+.info-table tr { border-bottom: 1px solid var(--rule); }
+.info-table tr:last-child { border-bottom: none; }
+.info-table th {
+  text-align: left;
+  padding: 10px 12px;
+  background: var(--navy);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+}
+.info-table td {
+  padding: 10px 12px;
+  vertical-align: top;
+  line-height: 1.55;
+}
+.info-table td:first-child {
+  font-weight: 700;
+  color: var(--navy);
+  white-space: nowrap;
+  background: #eef4fb;
+  min-width: 100px;
+}
+.info-table tr:nth-child(odd) td:not(:first-child) { background: #fff; }
+.info-table tr:nth-child(even) td:not(:first-child) { background: #f8fafd; }
+
+/* ── Steps ────────────────────────────────────────── */
+.steps { list-style: none; margin: 12px 0; }
+.steps li {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--rule);
+  font-size: 16px;
+}
+.steps li:last-child { border-bottom: none; }
+.step-num {
+  flex-shrink: 0;
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px;
+  font-weight: 800;
+  color: #fff;
+  margin-top: 2px;
+}
+.step-text { flex: 1; padding-top: 4px; }
+
+/* ── Callout ──────────────────────────────────────── */
+.callout {
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 15px;
+  line-height: 1.65;
+  margin: 14px 0;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+.callout-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+.callout.info  { background: #e8f1fb; border-left: 4px solid var(--blue); }
+.callout.warn  { background: #fff3e0; border-left: 4px solid var(--m3); }
+.callout.tip   { background: #e8f5f3; border-left: 4px solid var(--teal); }
+.callout.lock  { background: #f3e8ff; border-left: 4px solid var(--m4); }
+
+/* ── Flow ─────────────────────────────────────────── */
+.flow {
+  display: flex;
+  overflow-x: auto;
+  gap: 0;
+  margin: 16px 0;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding-bottom: 4px;
+}
+.flow::-webkit-scrollbar { display: none; }
+.flow-step {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 100px;
+}
+.flow-box {
+  width: 88px;
+  padding: 10px 6px;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.35;
+}
+.flow-arrow {
+  display: flex;
+  align-items: center;
+  padding: 0 2px;
+  align-self: center;
+  color: var(--muted);
+  font-size: 20px;
+  margin-top: -20px;
+}
+.flow-label {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 6px;
+  text-align: center;
+  line-height: 1.3;
+}
+
+/* ── Mode Cards ───────────────────────────────────── */
+.mode-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 12px 0; }
+.mode-card {
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--rule);
+}
+.mode-card-head {
+  padding: 12px;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  text-align: center;
+}
+.mode-card-body {
+  padding: 12px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #444;
+  background: #fafafa;
+}
+
+/* ── Type Table (data table) ──────────────────────── */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  margin: 12px 0;
+  overflow: hidden;
+  border-radius: 8px;
+  border: 1px solid var(--rule);
+}
+.data-table thead tr { background: var(--navy); color: #fff; }
+.data-table thead th { padding: 10px 10px; text-align: left; font-size: 13px; }
+.data-table tbody tr:nth-child(odd)  { background: #fff; }
+.data-table tbody tr:nth-child(even) { background: #f5f8fd; }
+.data-table tbody td { padding: 9px 10px; vertical-align: top; border-bottom: 1px solid #e8e8e8; }
+.data-table tbody td:first-child { font-weight: 700; color: var(--navy); }
+.tag {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 99px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+}
+
+/* ── Stat Bar ─────────────────────────────────────── */
+.stat-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin: 14px 0;
+}
+.stat-card {
+  background: #f0f5fc;
+  border-radius: 10px;
+  padding: 14px 8px;
+  text-align: center;
+  border: 1px solid #d0e0f4;
+}
+.stat-num { font-size: 24px; font-weight: 800; color: var(--blue); line-height: 1; }
+.stat-label { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+/* ── Bullets ──────────────────────────────────────── */
+ul.bl { list-style: none; margin: 10px 0; }
+ul.bl li {
+  font-size: 16px;
+  padding: 6px 0 6px 22px;
+  position: relative;
+  border-bottom: 1px solid #f0f0f0;
+  line-height: 1.6;
+}
+ul.bl li:last-child { border-bottom: none; }
+ul.bl li::before {
+  content: '▸';
+  position: absolute;
+  left: 0;
+  color: var(--blue);
+  font-size: 12px;
+  top: 9px;
+}
+
+/* ── Record Row ───────────────────────────────────── */
+.record-list { margin: 12px 0; }
+.record-item {
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+.record-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  background: #f5f5f5;
+  font-size: 14px;
+}
+.record-id { font-weight: 700; color: var(--navy); }
+.record-badge {
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 99px;
+  background: #d1fae5;
+  color: #065f46;
+  font-weight: 700;
+}
+.record-body { padding: 10px 14px; font-size: 14px; line-height: 1.7; }
+.record-body b { color: var(--navy); }
+
+/* ── Q&A ──────────────────────────────────────────── */
+.qa-item {
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  margin-bottom: 10px;
+  overflow: hidden;
+}
+.qa-q {
+  background: #eef3fb;
+  padding: 12px 16px;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--navy);
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+  user-select: none;
+}
+.qa-q .toggle { font-size: 18px; flex-shrink: 0; transition: transform .2s; }
+.qa-q.open .toggle { transform: rotate(45deg); }
+.qa-a {
+  display: none;
+  padding: 12px 16px;
+  font-size: 15px;
+  color: #333;
+  line-height: 1.7;
+  background: #fff;
+}
+.qa-a.show { display: block; }
+
+/* ── Error Table ──────────────────────────────────── */
+.err-table { width: 100%; border-collapse: collapse; font-size: 14px; margin: 12px 0; }
+.err-table th { background: #7f1d1d; color: #fff; padding: 10px 10px; text-align: left; font-size: 13px; }
+.err-table td { padding: 10px 10px; vertical-align: top; border-bottom: 1px solid #fecaca; }
+.err-table tbody tr:nth-child(odd) { background: #fff5f5; }
+.err-table tbody tr:nth-child(even) { background: #fff; }
+.err-table td:first-child { font-weight: 700; color: #991b1b; }
+
+/* ── Footer ───────────────────────────────────────── */
+footer {
+  background: var(--navy);
+  color: rgba(255,255,255,.5);
+  font-size: 13px;
+  text-align: center;
+  padding: 20px;
+  line-height: 1.8;
+}
+
+/* ── Divider ──────────────────────────────────────── */
+.divider {
+  height: 8px;
+  background: #f0f2f5;
+  margin: 0 -20px;
+}
+
+/* ── Responsive ───────────────────────────────────── */
+@media (max-width: 360px) {
+  .stat-row { grid-template-columns: repeat(2, 1fr); }
+  .mode-grid { grid-template-columns: 1fr; }
+  .flow-box { width: 76px; }
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+<!-- ═══ COVER ═══════════════════════════════════════ -->
+<div class="cover">
+  <div class="cover-temple">普高精舍</div>
+  <div class="cover-title">動態車輛排班系統<br>DVSS</div>
+  <div class="cover-sub">Dynamic Vehicle Scheduling System</div>
+  <div class="cover-badge">系統操作說明書</div>
+  <div class="cover-event">115年供佛齋僧法會</div>
+  <div class="mod-chips">
+    <div class="chip" data-m="1">
+      <div class="chip-num">模組一</div>
+      <div class="chip-name">報名管理</div>
+    </div>
+    <div class="chip" data-m="2">
+      <div class="chip-num">模組二</div>
+      <div class="chip-name">DVSS 派車</div>
+    </div>
+    <div class="chip" data-m="3">
+      <div class="chip-num">模組三</div>
+      <div class="chip-name">異動申請</div>
+    </div>
+    <div class="chip" data-m="4">
+      <div class="chip-num">模組四</div>
+      <div class="chip-name">出車點名</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ NAV ══════════════════════════════════════════ -->
+<nav class="toc" aria-label="目錄">
+  <div class="toc-scroll">
+    <a class="toc-link" href="#overview">
+      <div class="toc-dot" style="background:#888"></div>
+      <span class="toc-label">總覽</span>
+    </a>
+    <a class="toc-link" href="#mod1">
+      <div class="toc-dot" style="background:var(--m1)"></div>
+      <span class="toc-label">報名</span>
+    </a>
+    <a class="toc-link" href="#mod2">
+      <div class="toc-dot" style="background:var(--m2)"></div>
+      <span class="toc-label">派車</span>
+    </a>
+    <a class="toc-link" href="#mod3">
+      <div class="toc-dot" style="background:var(--m3)"></div>
+      <span class="toc-label">異動</span>
+    </a>
+    <a class="toc-link" href="#mod4">
+      <div class="toc-dot" style="background:var(--m4)"></div>
+      <span class="toc-label">點名</span>
+    </a>
+    <a class="toc-link" href="#faq">
+      <div class="toc-dot" style="background:#888"></div>
+      <span class="toc-label">Q&amp;A</span>
+    </a>
+    <a class="toc-link" href="#appendix">
+      <div class="toc-dot" style="background:#888"></div>
+      <span class="toc-label">附錄</span>
+    </a>
+  </div>
+</nav>
+
+<!-- ═══ OVERVIEW ═════════════════════════════════════ -->
+<section id="overview">
+  <div class="sec-header">
+    <div class="sec-icon" style="background:#eef3fb">🗂️</div>
+    <div>
+      <div class="sec-title">系統總覽</div>
+      <div class="sec-sub">架構、分工與本屆統計</div>
+    </div>
+  </div>
+
+  <p class="prose">DVSS 是為普高精舍大型法會設計的全流程派車管理平台，從報名收件、自動派車、臨時異動，到出車當日點名，一套系統全程數位化管理。</p>
+
+  <h3 class="sh">系統架構</h3>
+  <table class="info-table">
+    <tr><td>後端資料庫</td><td>Google Sheets（報名試算表 ＋ 派車試算表）</td></tr>
+    <tr><td>應用程式</td><td>Google Apps Script（GAS）兩套專案</td></tr>
+    <tr><td>前端介面</td><td>GitHub Pages 靜態網頁（手機優先）</td></tr>
+    <tr><td>通知管道</td><td>LINE 群組自動推播</td></tr>
+  </table>
+
+  <h3 class="sh">四模組工作流程</h3>
+  <div class="flow">
+    <div class="flow-step">
+      <div class="flow-box" style="background:var(--m1)">模組一<br>報名</div>
+      <div class="flow-label">收件建檔</div>
+    </div>
+    <div class="flow-arrow">›</div>
+    <div class="flow-step">
+      <div class="flow-box" style="background:var(--m2)">模組二<br>派車</div>
+      <div class="flow-label">自動分車</div>
+    </div>
+    <div class="flow-arrow">›</div>
+    <div class="flow-step">
+      <div class="flow-box" style="background:var(--m3)">模組三<br>異動</div>
+      <div class="flow-label">彈性調整</div>
+    </div>
+    <div class="flow-arrow">›</div>
+    <div class="flow-step">
+      <div class="flow-box" style="background:var(--m4)">模組四<br>點名</div>
+      <div class="flow-label">當日確認</div>
+    </div>
+  </div>
+
+  <h3 class="sh">本屆統計</h3>
+  <div class="stat-row">
+    <div class="stat-card"><div class="stat-num">246</div><div class="stat-label">總人數</div></div>
+    <div class="stat-card"><div class="stat-num">226</div><div class="stat-label">搭車人數</div></div>
+    <div class="stat-card"><div class="stat-num">20</div><div class="stat-label">自行前往</div></div>
+    <div class="stat-card"><div class="stat-num">8</div><div class="stat-label">派車數</div></div>
+  </div>
+
+  <h3 class="sh">重要連結</h3>
+  <table class="info-table">
+    <tr><td>報名試算表</td><td style="word-break:break-all;font-size:13px">spreadsheets/d/1f_SFqsv…</td></tr>
+    <tr><td>派車試算表</td><td style="word-break:break-all;font-size:13px">spreadsheets/d/19VQzhnY…</td></tr>
+    <tr><td>報名 GAS</td><td style="font-size:13px">1SzuZII…Rms8hz</td></tr>
+    <tr><td>派車/點名 GAS</td><td style="font-size:13px">1wb6Z5fw…TSS</td></tr>
+  </table>
+
+  <div class="callout info">
+    <span class="callout-icon">ℹ️</span>
+    <span>完整試算表連結請向系統管理員取得，或直接從 Google Drive 搜尋「115年供佛齋僧法會」。</span>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══ MODULE 1 ══════════════════════════════════════ -->
+<section id="mod1">
+  <div class="sec-header">
+    <div class="sec-icon" style="background:#dbeafe">📋</div>
+    <div>
+      <div class="sec-title" style="color:var(--m1)">模組一：報名管理</div>
+      <div class="sec-sub">收件、分類、建立初始車輛意向</div>
+    </div>
+  </div>
+
+  <p class="prose">報名模組負責收集所有法會參與者的基本資料，並建立初始的分車意向（搭大車 / 自行前往），作為後續 DVSS 派車的原始資料來源。</p>
+
+  <h3 class="sh">報名欄位說明</h3>
+  <table class="data-table">
+    <thead>
+      <tr><th>欄位</th><th>格式範例</th><th>說明</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>姓名</td><td>余雪</td><td>報名者本名</td></tr>
+      <tr><td>法名</td><td>法白</td><td>皈依法名（選填）</td></tr>
+      <tr><td>性別</td><td>男 / 女</td><td>用於車輛男女統計</td></tr>
+      <tr><td>班組別</td><td>日研女13</td><td>佛學班班別，影響 Pool 分組</td></tr>
+      <tr><td>法會身份</td><td>義工 / 信眾</td><td>決定分配到哪個 Pool</td></tr>
+      <tr><td>回山時間</td><td>7/31 18:30</td><td>去程梯次選擇</td></tr>
+      <tr><td>交通方式</td><td>去回精舍大車</td><td>搭大車或自行前往</td></tr>
+      <tr><td>同車備註</td><td>要與余素華同車</td><td>指定同乘對象（人工配對）</td></tr>
+      <tr><td>學員編號</td><td>110007952</td><td>唯一識別碼</td></tr>
+      <tr><td>眷屬欄位</td><td>眷屬姓名、生日、身分證</td><td>最多3位眷屬，隨行附掛</td></tr>
+    </tbody>
+  </table>
+
+  <h3 class="sh">Pool 分組規則</h3>
+  <div class="callout tip">
+    <span class="callout-icon">📌</span>
+    <span>Pool 分組決定每位參與者被派到哪一批車，是報名階段最關鍵的設定。</span>
+  </div>
+  <table class="info-table">
+    <tr><td style="color:var(--m1)">Pool A（義工）</td><td>義工身份者，本屆 2 車（A1/A2），各 29 人</td></tr>
+    <tr><td style="color:var(--m2)">Pool B（信眾小）</td><td>信眾較少批次，本屆 2 車（B1/B2），各 21 人</td></tr>
+    <tr><td style="color:var(--m3)">Pool C（信眾大）</td><td>信眾較多批次，本屆 4 車（C1–C4），各 31–32 人</td></tr>
+    <tr><td>自行前往</td><td>不占車位，獨立管理，共 20 人</td></tr>
+  </table>
+
+  <h3 class="sh">眷屬與配對機制</h3>
+  <ul class="bl">
+    <li>眷屬由已報名成員填寫，備註欄標記「眷屬」，不單獨報名</li>
+    <li>同車配對：在備註填入對方姓名，系統將兩人安排同車</li>
+    <li>配對失敗：指定對象尚未報名，記錄於「⚠️ 異常清單」工作表</li>
+  </ul>
+
+  <div class="callout warn">
+    <span class="callout-icon">⚠️</span>
+    <span><b>異常示例：</b>吳弘成指定「敬利平」同車，但對方尚未報名，系統將此列入異常清單，待幹部人工確認。</span>
+  </div>
+
+  <h3 class="sh">報名試算表工作表</h3>
+  <table class="info-table">
+    <tr><td>目前有效報名</td><td>最新報名名單（去除舊版本、取消者）</td></tr>
+    <tr><td>歷史記錄</td><td>所有報名與取消的完整時序記錄</td></tr>
+    <tr><td>系統設定</td><td>法會名稱、日期、梯次設定、開放狀態</td></tr>
+  </table>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══ MODULE 2 ══════════════════════════════════════ -->
+<section id="mod2">
+  <div class="sec-header">
+    <div class="sec-icon" style="background:#d1fae5">🚌</div>
+    <div>
+      <div class="sec-title" style="color:var(--m2)">模組二：DVSS 自動派車</div>
+      <div class="sec-sub">自動分組、配對同車、鎖定結果</div>
+    </div>
+  </div>
+
+  <p class="prose">DVSS 模組讀取報名試算表人員資料，依照 Pool 分組、同車配對、幹部安排等規則，自動計算最佳分車結果，並寫入各車工作表。</p>
+
+  <h3 class="sh">派車步驟</h3>
+  <ol class="steps">
+    <li><span class="step-num" style="background:var(--m2)">1</span><span class="step-text">從 DVSS 選單 → 執行派車</span></li>
+    <li><span class="step-num" style="background:var(--m2)">2</span><span class="step-text">系統讀取報名試算表全部人員名單</span></li>
+    <li><span class="step-num" style="background:var(--m2)">3</span><span class="step-text">依 Pool A / B / C 分別分組</span></li>
+    <li><span class="step-num" style="background:var(--m2)">4</span><span class="step-text">同車配對對象優先安排同車</span></li>
+    <li><span class="step-num" style="background:var(--m2)">5</span><span class="step-text">領隊 / 副領隊固定排入各車</span></li>
+    <li><span class="step-num" style="background:var(--m2)">6</span><span class="step-text">剩餘人員平均分配至各車</span></li>
+    <li><span class="step-num" style="background:var(--m2)">7</span><span class="step-text">寫入各車工作表，更新「📊 執行記錄」</span></li>
+    <li><span class="step-num" style="background:var(--m2)">8</span><span class="step-text">自動鎖定派車結果（🔒 派車鎖定）</span></li>
+  </ol>
+
+  <h3 class="sh">本屆派車結果</h3>
+  <table class="data-table">
+    <thead>
+      <tr><th>車號</th><th>批次</th><th>總人數</th><th>男</th><th>女</th><th>身份</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>A1</td><td>Pool A</td><td>29</td><td>6</td><td>23</td><td><span class="tag" style="background:var(--m1)">義工</span></td></tr>
+      <tr><td>A2</td><td>Pool A</td><td>29</td><td>6</td><td>23</td><td><span class="tag" style="background:var(--m1)">義工</span></td></tr>
+      <tr><td>B1</td><td>Pool B</td><td>21</td><td>3</td><td>18</td><td><span class="tag" style="background:var(--m2)">信眾</span></td></tr>
+      <tr><td>B2</td><td>Pool B</td><td>21</td><td>3</td><td>18</td><td><span class="tag" style="background:var(--m2)">信眾</span></td></tr>
+      <tr><td>C1</td><td>Pool C</td><td>32</td><td>6</td><td>26</td><td><span class="tag" style="background:var(--m3)">信眾</span></td></tr>
+      <tr><td>C2</td><td>Pool C</td><td>32</td><td>6</td><td>26</td><td><span class="tag" style="background:var(--m3)">信眾</span></td></tr>
+      <tr><td>C3</td><td>Pool C</td><td>31</td><td>6</td><td>25</td><td><span class="tag" style="background:var(--m3)">信眾</span></td></tr>
+      <tr><td>C4</td><td>Pool C</td><td>31</td><td>5</td><td>26</td><td><span class="tag" style="background:var(--m3)">信眾</span></td></tr>
+    </tbody>
+  </table>
+
+  <h3 class="sh">派車試算表工作表</h3>
+  <table class="info-table">
+    <tr><td>A1–第1車 ～ C4–第4車</td><td>各車完整名單，含幹部、班組、同車標記</td></tr>
+    <tr><td>自行</td><td>自行前往者名單，共 20 人</td></tr>
+    <tr><td>⚠️ 異常清單</td><td>配對失敗、未報名眷屬等異常記錄</td></tr>
+    <tr><td>異動申請</td><td>所有異動申請記錄與審核狀態</td></tr>
+    <tr><td>📊 執行記錄</td><td>最後派車時間與各組人數統計</td></tr>
+    <tr><td>🔒 派車鎖定</td><td>鎖定狀態，防止意外重新派車</td></tr>
+  </table>
+
+  <div class="callout warn">
+    <span class="callout-icon">🔒</span>
+    <span><b>派車鎖定：</b>派車完成後自動鎖定。本屆鎖定時間：2026/06/15 02:01。如需重新派車，請從 DVSS 選單手動解鎖（需管理員權限）。</span>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══ MODULE 3 ══════════════════════════════════════ -->
+<section id="mod3">
+  <div class="sec-header">
+    <div class="sec-icon" style="background:#ffedd5">✏️</div>
+    <div>
+      <div class="sec-title" style="color:var(--m3)">模組三：異動申請</div>
+      <div class="sec-sub">派車後彈性調整、幹部線上審核</div>
+    </div>
+  </div>
+
+  <p class="prose">派車完成後，若有成員需要更換車號、取消報名，或調整去/回程方式，可透過「異動申請」模組提出。幹部線上審核後，系統自動更新派車試算表。</p>
+
+  <h3 class="sh">異動類型</h3>
+  <table class="info-table">
+    <tr><td>轉車</td><td>將成員從原車移至另一車（去/回程可分別設定）</td></tr>
+    <tr><td>取消報名</td><td>從車輛名單刪除，不再占車位</td></tr>
+    <tr><td>去大車─回自行</td><td>去程搭大車，回程改自行前往</td></tr>
+    <tr><td>自行─改搭大車</td><td>原自行前往，改為搭大車</td></tr>
+    <tr><td>其他</td><td>自由填寫，由幹部人工確認</td></tr>
+  </table>
+
+  <h3 class="sh">申請流程</h3>
+  <ol class="steps">
+    <li><span class="step-num" style="background:var(--m3)">1</span><span class="step-text">申請人開啟異動申請網頁</span></li>
+    <li><span class="step-num" style="background:var(--m3)">2</span><span class="step-text">輸入車號、申請人姓名、對象姓名</span></li>
+    <li><span class="step-num" style="background:var(--m3)">3</span><span class="step-text">選擇異動類型，填寫說明</span></li>
+    <li><span class="step-num" style="background:var(--m3)">4</span><span class="step-text">送出申請，系統產生申請編號（R+時間戳）</span></li>
+    <li><span class="step-num" style="background:var(--m3)">5</span><span class="step-text">申請寫入「異動申請」工作表，狀態：待審核</span></li>
+    <li><span class="step-num" style="background:var(--m3)">6</span><span class="step-text">幹部收到通知，登入後台審核</span></li>
+    <li><span class="step-num" style="background:var(--m3)">7</span><span class="step-text">核准後，系統自動修改對應車輛工作表</span></li>
+    <li><span class="step-num" style="background:var(--m3)">8</span><span class="step-text">狀態更新為「已核准」，記錄處理時間</span></li>
+  </ol>
+
+  <h3 class="sh">申請記錄欄位</h3>
+  <table class="info-table">
+    <tr><td>申請編號</td><td>R + 毫秒時間戳，唯一識別碼<br><small style="color:var(--muted)">例：R1781438069190</small></td></tr>
+    <tr><td>申請時間</td><td>YYYY/MM/DD HH:mm:ss</td></tr>
+    <tr><td>車號</td><td>申請人所在車號（自動帶入）</td></tr>
+    <tr><td>申請人</td><td>提交申請的領隊或義工姓名</td></tr>
+    <tr><td>對象姓名</td><td>要異動的乘客姓名</td></tr>
+    <tr><td>異動類型</td><td>轉車、取消報名等</td></tr>
+    <tr><td>目標車</td><td>轉車時填入目的車號</td></tr>
+    <tr><td>狀態</td><td>待審核 / 已核准 / 不通過</td></tr>
+    <tr><td>管理備註</td><td>幹部審核操作說明</td></tr>
+    <tr><td>處理時間</td><td>幹部完成審核的時間</td></tr>
+  </table>
+
+  <h3 class="sh">本屆異動紀錄</h3>
+  <div class="record-list">
+    <div class="record-item">
+      <div class="record-head">
+        <span class="record-id">林百壽 → 周端梅</span>
+        <span class="record-badge">✅ 已核准</span>
+      </div>
+      <div class="record-body">
+        <b>車號：</b>C2　<b>類型：</b>其他（轉車）<br>
+        周端梅 由 C2 移至 C3（去 C3 ／ 回 C3）
+      </div>
+    </div>
+    <div class="record-item">
+      <div class="record-head">
+        <span class="record-id">許來展 → 林妙葵</span>
+        <span class="record-badge">✅ 已核准</span>
+      </div>
+      <div class="record-body">
+        <b>車號：</b>C2　<b>類型：</b>去大車─回自行<br>
+        林妙葵 去程 C2 ／ 回程改自行
+      </div>
+    </div>
+    <div class="record-item">
+      <div class="record-head">
+        <span class="record-id">余雪 → 陳錦華</span>
+        <span class="record-badge">✅ 已核准</span>
+      </div>
+      <div class="record-body">
+        <b>車號：</b>A1　<b>類型：</b>取消報名<br>
+        原因：家人生病，已從 A1 刪除陳錦華
+      </div>
+    </div>
+    <div class="record-item">
+      <div class="record-head">
+        <span class="record-id">俞貞元 → 曾秀雲</span>
+        <span class="record-badge">✅ 已核准</span>
+      </div>
+      <div class="record-body">
+        <b>車號：</b>A1　<b>類型：</b>取消報名<br>
+        已從 A1 刪除曾秀雲
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══ MODULE 4 ══════════════════════════════════════ -->
+<section id="mod4">
+  <div class="sec-header">
+    <div class="sec-icon" style="background:#ede9fe">✋</div>
+    <div>
+      <div class="sec-title" style="color:var(--m4)">模組四：出車點名</div>
+      <div class="sec-sub">自助報到、領隊點名、即時統計</div>
+    </div>
+  </div>
+
+  <p class="prose">出車點名模組在法會當日使用，支援「自助報到」與「領隊點名」兩種模式，即時將結果寫入「點名記錄」工作表。</p>
+
+  <h3 class="sh">兩種點名模式</h3>
+  <div class="mode-grid">
+    <div class="mode-card">
+      <div class="mode-card-head" style="background:var(--m4)">🙋 自助報到</div>
+      <div class="mode-card-body">乘客自行開啟連結或掃碼，系統自動識別身份完成報到。適合熟悉手機操作的成員。</div>
+    </div>
+    <div class="mode-card">
+      <div class="mode-card-head" style="background:#5b21b6">📋 領隊點名</div>
+      <div class="mode-card-body">領隊手持裝置逐一確認名單，替成員代為完成點名。適合年長成員。</div>
+    </div>
+  </div>
+
+  <h3 class="sh">三輪點名時序</h3>
+  <table class="info-table">
+    <tr><td>第一輪</td><td>出發前 1 小時，確認到場人數</td></tr>
+    <tr><td>第二輪</td><td>出發前 30 分鐘，確認上車人數</td></tr>
+    <tr><td>第三輪</td><td>出發前最終確認，車門關閉前點名</td></tr>
+  </table>
+
+  <h3 class="sh">點名記錄欄位</h3>
+  <table class="info-table">
+    <tr><td>車號</td><td>點名所屬車輛（A1、B2…）</td></tr>
+    <tr><td>類別</td><td>go（去程）/ back（回程）</td></tr>
+    <tr><td>識別鍵</td><td>姓名｜電話，例：吳志明｜931916631</td></tr>
+    <tr><td>姓名</td><td>點名成員姓名</td></tr>
+    <tr><td>時間</td><td>MM/DD HH:mm 格式</td></tr>
+    <tr><td>來源</td><td>self（自助）/ leader（領隊代點）</td></tr>
+  </table>
+
+  <h3 class="sh">本屆點名記錄（示例）</h3>
+  <table class="data-table">
+    <thead>
+      <tr><th>車號</th><th>時間</th><th>姓名</th><th>來源</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>A1</td><td>06/15 01:57</td><td>吳志明</td><td><span class="tag" style="background:#059669">自助</span></td></tr>
+      <tr><td>A1</td><td>06/15 17:29</td><td>胡益鐘</td><td><span class="tag" style="background:#7030a0">領隊</span></td></tr>
+      <tr><td>B1</td><td>06/15 23:46</td><td>余素華</td><td><span class="tag" style="background:#059669">自助</span></td></tr>
+    </tbody>
+  </table>
+
+  <h3 class="sh">自助報到設定</h3>
+  <table class="info-table">
+    <tr><td>設定位置</td><td>「點名設定」工作表，設定各車開啟/關閉</td></tr>
+    <tr><td>建議時機</td><td>出車前 30 分鐘開啟，上車完畢後關閉</td></tr>
+  </table>
+
+  <div class="callout tip">
+    <span class="callout-icon">💡</span>
+    <span>領隊可在每輪點名後，查看「點名記錄」工作表依車號篩選，即時掌握各車上車人數，若有缺席者可立即聯繫確認。</span>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══ FAQ ═══════════════════════════════════════════ -->
+<section id="faq">
+  <div class="sec-header">
+    <div class="sec-icon" style="background:#f0fdf4">❓</div>
+    <div>
+      <div class="sec-title">常見問題 Q&amp;A</div>
+      <div class="sec-sub">點擊問題展開解答</div>
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q" onclick="toggleQA(this)">
+      <span>派車後名單有誤，如何處理？</span>
+      <span class="toggle">+</span>
+    </div>
+    <div class="qa-a">透過「異動申請」模組提交申請，由幹部審核後系統自動更新。<b>切勿直接修改派車試算表</b>，以免資料不一致。</div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q" onclick="toggleQA(this)">
+      <span>自助報到連結要如何取得？</span>
+      <span class="toggle">+</span>
+    </div>
+    <div class="qa-a">各車的自助報到連結由系統管理員在「點名設定」工作表設定，再透過 LINE 群組推播給各車乘客。</div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q" onclick="toggleQA(this)">
+      <span>派車鎖定後，如何重新派車？</span>
+      <span class="toggle">+</span>
+    </div>
+    <div class="qa-a">需由管理員從 DVSS 選單手動解鎖，確認無誤後再執行派車。<b>重新派車會覆蓋現有名單</b>，請謹慎操作。</div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q" onclick="toggleQA(this)">
+      <span>眷屬沒有報名，如何安排座位？</span>
+      <span class="toggle">+</span>
+    </div>
+    <div class="qa-a">眷屬由同行的已報名成員在報名時一併登記，填入眷屬欄位（姓名、生日、身分證），系統將其列入同一車輛，不需單獨報名。</div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q" onclick="toggleQA(this)">
+      <span>取消報名後，車輛是否自動補位？</span>
+      <span class="toggle">+</span>
+    </div>
+    <div class="qa-a">取消報名只刪除該成員，不會自動補位。如需補充人員，需由幹部透過異動申請手動安排。</div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q" onclick="toggleQA(this)">
+      <span>如何查看各車即時上車人數？</span>
+      <span class="toggle">+</span>
+    </div>
+    <div class="qa-a">開啟派車試算表「點名記錄」工作表，依車號篩選查看。也可使用系統後台的即時儀表板（如有部署）。</div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q" onclick="toggleQA(this)">
+      <span>同車配對顯示「配對失敗」怎麼辦？</span>
+      <span class="toggle">+</span>
+    </div>
+    <div class="qa-a">至「⚠️ 異常清單」工作表查看詳情，確認指定對象是否已完成報名。如對方已報名但仍顯示失敗，可能是姓名填寫不一致，請聯繫系統管理員手動調整。</div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══ APPENDIX ═══════════════════════════════════════ -->
+<section id="appendix">
+  <div class="sec-header">
+    <div class="sec-icon" style="background:#fafafa">📎</div>
+    <div>
+      <div class="sec-title">附錄</div>
+      <div class="sec-sub">車號說明、異常快查、版本記錄</div>
+    </div>
+  </div>
+
+  <h3 class="sh">車輛簡碼說明</h3>
+  <table class="info-table">
+    <tr><td>A1 / A2</td><td>義工車 第1、2車（各 29 人）</td></tr>
+    <tr><td>B1 / B2</td><td>信眾小車 第1、2車（各 21 人）</td></tr>
+    <tr><td>C1 ～ C4</td><td>信眾大車 第1–4車（各 31–32 人）</td></tr>
+    <tr><td>自行</td><td>不搭車，自行前往</td></tr>
+  </table>
+
+  <h3 class="sh">異常快查</h3>
+  <table class="err-table">
+    <thead><tr><th>異常情形</th><th>建議處理</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>自助報到無法開啟</td>
+        <td>確認網路連線、GAS 部署狀態，並確認「點名設定」已開啟該車功能</td>
+      </tr>
+      <tr>
+        <td>異動申請未收到通知</td>
+        <td>確認 LINE 推播設定，或直接查看「異動申請」工作表</td>
+      </tr>
+      <tr>
+        <td>派車人數與報名不符</td>
+        <td>查看「⚠️ 異常清單」，確認是否有配對失敗或刪除記錄</td>
+      </tr>
+      <tr>
+        <td>點名記錄重複</td>
+        <td>系統以「識別鍵」去重（姓名＋電話），不影響統計</td>
+      </tr>
+      <tr>
+        <td>試算表被意外修改</td>
+        <td>使用 Google Sheets「版本記錄」功能還原，再重新鎖定派車</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3 class="sh">版本記錄</h3>
+  <table class="info-table">
+    <tr><td>v1.0</td><td>2026/06/16　初版建立，涵蓋四大模組完整說明</td></tr>
+  </table>
+</section>
+
+<!-- ═══ FOOTER ════════════════════════════════════════ -->
+<footer>
+  <div>普高精舍　DVSS 動態車輛排班系統</div>
+  <div>115年供佛齋僧法會　系統操作說明書 v1.0</div>
+  <div style="margin-top:6px;font-size:11px;opacity:.6">2026年6月　資料組製作</div>
+</footer>
+
+</div><!-- /wrap -->
+
+<script>
+// Q&A toggle
+function toggleQA(el) {
+  el.classList.toggle('open');
+  const ans = el.nextElementSibling;
+  ans.classList.toggle('show');
+}
+
+// Sticky nav active highlight on scroll
+(function() {
+  const sections = document.querySelectorAll('section[id]');
+  const links = document.querySelectorAll('.toc-link');
+
+  function onScroll() {
+    let current = '';
+    sections.forEach(sec => {
+      if (window.scrollY >= sec.offsetTop - 80) current = sec.id;
+    });
+    links.forEach(link => {
+      link.classList.toggle('active', link.getAttribute('href') === '#' + current);
+    });
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+})();
+</script>
+</body>
+</html>
