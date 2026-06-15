@@ -27,7 +27,7 @@
       --teal: #1e4238;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    html { font-size: 0.8889rem; -webkit-text-size-adjust: 100%; }
+    html { font-size: 16px; -webkit-text-size-adjust: 100%; }
     body {
       -webkit-font-smoothing: antialiased;
       -webkit-tap-highlight-color: transparent;
@@ -51,7 +51,7 @@
       border-bottom: 2px solid #e8d9c0; position: relative;
     }
     #event-name {
-      font-family: 'Noto Serif TC',serif; font-size: .85rem; font-weight: 700;
+      font-family: 'Noto Serif TC',serif; font-size: 14px; font-weight: 700;
       color: #a8916c; letter-spacing: .06em; line-height: 1.4; min-height: 1em;
     }
     header h1 {
@@ -63,7 +63,7 @@
       width: 40px; height: 40px; border-radius: 50%;
       background: linear-gradient(135deg,#fffbf3,#f3e5cc);
       border: 1.5px solid var(--gold-border);
-      font-size: 0.8889rem; cursor: pointer; display: flex;
+      font-size: 14px; cursor: pointer; display: flex;
       align-items: center; justify-content: center;
       box-shadow: 0 2px 5px rgba(184,134,11,0.15);
       -webkit-tap-highlight-color: transparent; z-index: 101;
@@ -80,12 +80,12 @@
       flex: 1; padding: 11px 4px; border-radius: 12px 12px 0 0;
       border: 2px solid #e0d0b0; border-bottom: none;
       background: #f3ecdf; color: #8a7050;
-      font-family: 'Noto Serif TC',serif; font-weight: 900; font-size: 0.8889rem;
+      font-family: 'Noto Serif TC',serif; font-weight: 900; font-size: 15px;
       cursor: pointer; -webkit-tap-highlight-color: transparent;
       text-align: center; transition: all .15s; line-height: 1.3;
     }
     .round-tab small { display: block; font-family: 'Noto Sans TC',sans-serif;
-      font-size: 0.68rem; font-weight: 700; color: #a89070; }
+      font-size: 12px; font-weight: 700; color: #a89070; }
     .round-tab.active {
       background: #fff; color: var(--maroon); border-color: var(--maroon);
       box-shadow: 0 -2px 8px rgba(128,24,24,0.08);
@@ -104,10 +104,10 @@
       box-shadow: inset 0 1px 3px rgba(0,0,0,0.02);
     }
     .top-stat-box .num {
-      font-size: 0.8889rem; font-weight: 900;
+      font-size: 14px; font-weight: 900;
       font-family: 'Noto Serif TC',serif; line-height: 1;
     }
-    .top-stat-box .lbl { font-size: 0.85rem; color: #5a4020; margin-top: 4px; font-weight: 700; }
+    .top-stat-box .lbl { font-size: 14px; color: #5a4020; margin-top: 4px; font-weight: 700; }
     .num-green { color: var(--green); }
     .num-red   { color: var(--red); }
     .num-gray  { color: #5a4020; }
@@ -117,20 +117,20 @@
 
     #self-disabled-note {
       display: none; background: var(--red-pale); border: 2px solid var(--red-border);
-      border-radius: 12px; padding: 12px; font-size: 0.8889rem; font-weight: 700;
+      border-radius: 12px; padding: 12px; font-size: 14px; font-weight: 700;
       color: var(--red); text-align: center; margin-bottom: 14px;
     }
     #readonly-bar {
       display: none; background: linear-gradient(135deg,#fff8e1,#fffde7);
       border: 2px solid var(--gold-border); border-radius: 12px;
-      padding: 12px; text-align: center; font-size: 0.8889rem;
+      padding: 12px; text-align: center; font-size: 14px;
       color: #78350f; font-weight: 700; margin-bottom: 14px;
     }
     #err-screen {
       display: none; padding: 60px 24px; text-align: center;
     }
-    #err-screen .e-icon { font-size: 0.8889rem; }
-    #err-screen .e-msg { font-size: 0.8889rem; font-weight: 700; color: var(--maroon); margin-top: 14px; line-height: 2; }
+    #err-screen .e-icon { font-size: 14px; }
+    #err-screen .e-msg { font-size: 14px; font-weight: 700; color: var(--maroon); margin-top: 14px; line-height: 2; }
 
     /* ── 快速跳轉 ── */
     .jump-bar { margin-bottom: 16px; position: relative; }
@@ -144,16 +144,16 @@
     }
     .jump-select:focus { border-color: var(--gold); }
     .jump-icon  { position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
-      font-size: 0.8889rem; color: #887050; pointer-events: none; }
+      font-size: 14px; color: #887050; pointer-events: none; }
     .jump-arrow { position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
-      font-size: 0.8889rem; color: var(--gray); pointer-events: none; }
+      font-size: 14px; color: var(--gray); pointer-events: none; }
 
     /* ── 篩選列 ── */
     .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
     .section-header h2 { font-family: 'Noto Serif TC',serif; font-size: 1.2rem; font-weight: 900; color: var(--maroon); }
     .filter-bar { display: flex; gap: 6px; }
     .filter-btn {
-      padding: 10px 14px; font-size: 0.8889rem; border-radius: 10px;
+      padding: 10px 14px; font-size: 14px; border-radius: 10px;
       border: 2px solid #b8a080; background: var(--white); color: var(--ink);
       font-family: 'Noto Sans TC',sans-serif; font-weight: 700;
       cursor: pointer; -webkit-tap-highlight-color: transparent; white-space: nowrap;
@@ -179,23 +179,23 @@
 
     .card-row1 { display: flex; align-items: center; gap: 12px; }
     .card-order {
-      font-family: 'Noto Serif TC',serif; font-size: 0.8889rem; font-weight: 900; color: var(--maroon);
+      font-family: 'Noto Serif TC',serif; font-size: 14px; font-weight: 900; color: var(--maroon);
       background: #fdf2f2; padding: 2px 8px; border-radius: 6px; min-width: 38px; text-align: center;
     }
     .card-name   { font-size: 16px; font-weight: 700; color: var(--ink); }
-    .card-dharma { font-size: 0.8889rem; color: #555; font-weight: 500;
+    .card-dharma { font-size: 14px; color: #555; font-weight: 500;
       background: #efe8dc; padding: 2px 8px; border-radius: 4px; }
-    .card-phone  { font-family: monospace; font-size: 0.8889rem; color: #5a4020;
+    .card-phone  { font-family: monospace; font-size: 14px; color: #5a4020;
       margin-left: auto; font-weight: 700; white-space: nowrap; }
     .card-row2 { display: flex; align-items: center; flex-wrap: wrap; gap: 6px;
       border-top: 1px dashed #efe8dc; padding-top: 8px; }
 
-    .badge { display: inline-block; padding: 5px 12px; border-radius: 20px; font-size: 0.88rem; font-weight: 900; }
+    .badge { display: inline-block; padding: 5px 12px; border-radius: 20px; font-size: 14px; font-weight: 900; }
     .badge-present { background: var(--green-pale); color: var(--green); border: 1px solid var(--green-border); }
     .badge-none    { background: #f0f0f0; color: #444; border: 1px solid #ccc; }
     .badge-frozen  { background: #ffd6d6; color: #a03030; border: 1px solid #e07070; }
 
-    .tag { display: inline-block; font-size: 0.78rem; padding: 3px 8px; border-radius: 8px; font-weight: 700; }
+    .tag { display: inline-block; font-size: 12px; padding: 3px 8px; border-radius: 8px; font-weight: 700; }
     .tag-m    { background: #e3f2fd; color: #0d47a1; }
     .tag-f    { background: #fce4ec; color: #880e4f; }
     .tag-unit { background: #f3e8ff; color: #5b21b6; }
@@ -213,17 +213,17 @@
     .sw-card-info { display: flex; flex-direction: column; padding: 14px 16px 10px; gap: 8px; }
     .sw-row1 { display: flex; align-items: center; gap: 12px; }
     .sw-order {
-      font-family: 'Noto Serif TC',serif; font-size: 0.8889rem; font-weight: 900; color: var(--maroon);
+      font-family: 'Noto Serif TC',serif; font-size: 14px; font-weight: 900; color: var(--maroon);
       background: #fdf2f2; padding: 2px 8px; border-radius: 6px; min-width: 38px; text-align: center;
     }
     .sw-name   { font-size: 16px; font-weight: 700; }
-    .sw-dharma { font-size: 0.8889rem; color: #555; background: #efe8dc; padding: 2px 8px; border-radius: 4px; }
-    .sw-phone  { font-size: 0.8889rem; color: #1a4a8a; margin-left: auto; font-weight: 700;
+    .sw-dharma { font-size: 14px; color: #555; background: #efe8dc; padding: 2px 8px; border-radius: 4px; }
+    .sw-phone  { font-size: 14px; color: #1a4a8a; margin-left: auto; font-weight: 700;
       text-decoration: none; white-space: nowrap; }
     .sw-phone:active { opacity: .7; }
     .sw-row2 { display: flex; align-items: center; flex-wrap: wrap; gap: 6px;
       border-top: 1px dashed #e2e2e2; padding-top: 8px; }
-    .sw-time { font-size: 0.78rem; color: var(--green); font-weight: 700; margin-left: auto; }
+    .sw-time { font-size: 12px; color: var(--green); font-weight: 700; margin-left: auto; }
     .sw-badge-wrap { margin-left: auto; }
 
     /* ── 長按按鈕 ── */
@@ -231,15 +231,15 @@
     .hold-btn {
       flex: 1; position: relative; overflow: hidden;
       padding: 16px 8px; border-radius: 14px; border: none;
-      font-family: 'Noto Sans TC',sans-serif; font-weight: 900; font-size: 0.88rem;
+      font-family: 'Noto Sans TC',sans-serif; font-weight: 900; font-size: 14px;
       cursor: pointer; -webkit-tap-highlight-color: transparent;
       display: flex; flex-direction: column; align-items: center; gap: 6px;
       user-select: none; touch-action: manipulation; min-height: 72px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.06);
       transition: transform 0.1s ease, box-shadow 0.1s ease;
     }
-    .hold-btn .hb-icon  { font-size: 0.8889rem; line-height: 1; }
-    .hold-btn .hb-label { font-size: 0.82rem; text-align: center; font-weight: 800; }
+    .hold-btn .hb-icon  { font-size: 14px; line-height: 1; }
+    .hold-btn .hb-label { font-size: 13px; text-align: center; font-weight: 800; }
     .hold-btn.holding   { transform: scale(0.96); animation: pulse-border 1.5s infinite alternate; }
     @keyframes pulse-border {
       from { box-shadow: 0 0 0 0 rgba(180,120,60,0.3); }
@@ -283,9 +283,9 @@
     }
 
     /* PIN */
-    .pin-label { font-size: 0.8889rem; color: var(--ink); margin-bottom: 12px; font-weight: 700; text-align: center; }
+    .pin-label { font-size: 14px; color: var(--ink); margin-bottom: 12px; font-weight: 700; text-align: center; }
     .pin-field {
-      width: 100%; padding: 16px; font-size: 0.8889rem; text-align: center; letter-spacing: .4em;
+      width: 100%; padding: 16px; font-size: 14px; text-align: center; letter-spacing: .4em;
       border: 2.5px solid #c8b48a; border-radius: 14px;
       background: var(--gold-pale); color: var(--ink);
       font-family: 'Noto Serif TC',serif; font-weight: 900;
@@ -294,34 +294,34 @@
     .pin-field:focus { border-color: var(--gold); box-shadow: 0 0 0 4px rgba(184,134,11,.15); background:#fff; }
     .pin-submit {
       width: 100%; border: none; border-radius: 14px; padding: 16px;
-      font-family: 'Noto Serif TC',serif; font-size: 0.8889rem; letter-spacing: 4px; font-weight: 900;
+      font-family: 'Noto Serif TC',serif; font-size: 14px; letter-spacing: 4px; font-weight: 900;
       background: #ccc; color: #fff; cursor: pointer; transition: all .2s; margin-top: 14px;
     }
     .pin-submit.ready { background: linear-gradient(135deg,var(--teal),#1e4238);
       box-shadow: 0 4px 15px rgba(45,93,79,.3); }
     .pin-submit.ready:active { transform: scale(.98); }
-    .pin-error { text-align: center; font-size: 0.8889rem; color: var(--red);
+    .pin-error { text-align: center; font-size: 14px; color: var(--red);
       min-height: 24px; margin-top: 10px; font-weight: 700; }
 
     /* 領隊後台 */
     .leader-section { margin-bottom: 16px; }
     .leader-section-title {
-      font-family: 'Noto Serif TC',serif; font-size: 1.05rem; font-weight: 900;
+      font-family: 'Noto Serif TC',serif; font-size: 16px; font-weight: 900;
       color: var(--maroon); margin-bottom: 12px; padding-bottom: 8px;
       border-bottom: 2px solid #f5e6cc;
     }
     .admin-summary { display: grid; grid-template-columns: repeat(2,1fr); gap: 10px; margin-bottom: 14px; }
     .sum-box { background: #fffaf5; border-radius: 14px; padding: 14px; text-align: center;
       border: 2px solid #ffe0b2; box-shadow: inset 0 1px 3px rgba(0,0,0,0.02); }
-    .sum-box .s-num { font-size: 0.8889rem; font-weight: 900; font-family: 'Noto Serif TC',serif; line-height: 1; }
-    .sum-box .s-lbl { font-size: 0.85rem; color: #5a4020; margin-top: 4px; font-weight: 700; }
+    .sum-box .s-num { font-size: 14px; font-weight: 900; font-family: 'Noto Serif TC',serif; line-height: 1; }
+    .sum-box .s-lbl { font-size: 14px; color: #5a4020; margin-top: 4px; font-weight: 700; }
 
     /* 領隊面板輪次切換（小型） */
     .mini-rounds { display: flex; gap: 6px; margin-bottom: 14px; }
     .mini-round {
       flex: 1; padding: 10px 4px; border-radius: 10px;
       border: 2px solid #b8a080; background: #fff; color: #8a7050;
-      font-family: 'Noto Sans TC',sans-serif; font-weight: 900; font-size: 0.88rem;
+      font-family: 'Noto Sans TC',sans-serif; font-weight: 900; font-size: 14px;
       cursor: pointer; -webkit-tap-highlight-color: transparent; text-align: center;
     }
     .mini-round.active { border-color: var(--maroon); background: #fff5f5; color: var(--maroon); }
@@ -329,7 +329,7 @@
     /* 通用按鈕 */
     .btn {
       display: inline-block; padding: 15px 18px; min-height: 44px; border-radius: 14px; border: none;
-      font-family: 'Noto Sans TC',sans-serif; font-weight: 900; font-size: 0.8889rem;
+      font-family: 'Noto Sans TC',sans-serif; font-weight: 900; font-size: 14px;
       cursor: pointer; transition: opacity .15s; text-align: center;
       -webkit-tap-highlight-color: transparent;
     }
@@ -345,7 +345,7 @@
       display: none; position: fixed; bottom: 28px; right: 18px;
       width: 48px; height: 48px; border-radius: 50%;
       background: var(--maroon); color: #fff;
-      border: none; font-size: 0.8889rem; font-weight: 900;
+      border: none; font-size: 14px; font-weight: 900;
       cursor: pointer; z-index: 600;
       box-shadow: 0 4px 14px rgba(0,0,0,.25);
       -webkit-tap-highlight-color: transparent;
@@ -360,12 +360,12 @@
       position: fixed; bottom: 36px; left: 50%;
       transform: translateX(-50%) translateY(120px);
       background: #111; color: #fff; padding: 14px 26px;
-      border-radius: 40px; font-size: 0.8889rem; font-weight: 700;
+      border-radius: 40px; font-size: 14px; font-weight: 700;
       z-index: 9999; transition: transform .28s;
       white-space: nowrap; box-shadow: 0 8px 28px rgba(0,0,0,.35);
     }
     #toast.show { transform: translateX(-50%) translateY(0); }
-    footer { text-align: center; padding: 18px 0 36px; color: #bbb; font-size: 0.7rem; }
+    footer { text-align: center; padding: 18px 0 36px; color: #bbb; font-size: 12px; }
   </style>
 </head>
 <body>
