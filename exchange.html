@@ -47,12 +47,16 @@
     /* ── 置頂 ── */
     #sticky-top { position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
     header {
-      background: #fdf8f0; padding: 12px 60px 12px 14px; text-align: center;
+      background: #fdf8f0; padding: 8px 60px 10px 14px; text-align: center;
       border-bottom: 2px solid #e8d9c0; position: relative;
     }
+    #event-name {
+      font-family: 'Noto Serif TC',serif; font-size: .85rem; font-weight: 700;
+      color: #a8916c; letter-spacing: .06em; line-height: 1.4; min-height: 1em;
+    }
     header h1 {
-      font-family: 'Noto Serif TC',serif; font-size: 1.33rem; font-weight: 900;
-      letter-spacing: .04em; color: var(--maroon);
+      font-family: 'Noto Serif TC',serif; font-size: 1.25rem; font-weight: 900;
+      letter-spacing: .04em; color: var(--maroon); line-height: 1.3;
     }
     #logout-btn {
       display: none; position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
@@ -319,6 +323,7 @@
 
 <div id="sticky-top">
   <header>
+    <div id="event-name"></div>
     <h1 id="page-title">☸ 出車異動申請</h1>
     <button id="admin-gear" onclick="openAdminSheet()" title="管理者">⚙️</button>
     <button id="logout-btn" onclick="location.reload()" title="登出">登出</button>
@@ -480,7 +485,8 @@ function leaderLogin(){
     if (!d.ok) { err.textContent = d.msg; err.className = 'pin-error'; return; }
     Object.assign(S, { role:d.role, name:d.name, car:d.car, cars:d.cars,
                        roster:d.roster, sheetUrl:d.sheetUrl || '', eventName:d.eventName || '' });
-    $('page-title').textContent = (S.eventName ? S.eventName + '　' : '') + '☸ ' + S.car + ' 車異動申請';
+    $('event-name').textContent = S.eventName || '';
+    $('page-title').textContent = '☸ ' + S.car + ' 車異動申請';
     $('logout-btn').classList.add('show');
     $('admin-gear').classList.add('hidden');
     $('login-view').classList.add('hidden');
@@ -506,7 +512,8 @@ function adminLogin(){
     if (!d.ok) { err.textContent = d.msg; err.className = 'form-msg err'; return; }
     closeAdminSheet();
     S.adminCode = code; S.cars = d.cars; S.eventName = d.eventName || '';
-    $('page-title').textContent = (S.eventName ? S.eventName + '　' : '') + '☸ 異動審核管理';
+    $('event-name').textContent = S.eventName || '';
+    $('page-title').textContent = '☸ 異動審核管理';
     $('logout-btn').classList.add('show');
     $('admin-gear').classList.add('hidden');
     $('login-view').classList.add('hidden');
