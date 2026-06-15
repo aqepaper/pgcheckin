@@ -543,8 +543,7 @@ async function loadData(){
       if(typeof r.selfCheckin === 'boolean') selfCheckinEnabled = r.selfCheckin;
       if(r.eventName) {
         document.getElementById('event-name').textContent = r.eventName;
-        document.getElementById('event-name').textContent = '';
-  document.getElementById('page-title').textContent = '☸ ' + CAR + ' 車出車點名';
+        document.getElementById('page-title').textContent = '☸ ' + CAR + ' 車出車點名';
         document.title = r.eventName + '　' + CAR + ' 車點名';
         document.getElementById('footer').textContent = 'AQE@2026 · ' + r.eventName + ' · ' + CAR + ' 車';
       }
@@ -968,7 +967,6 @@ document.getElementById('back-to-top').onclick = function(){
 window.onload = async () => {
   isReadonly = (window.location.hash === '#readonly');
   if(!CAR){ showErr('請由各車專屬連結進入<br>例如：<b>?car=A1</b>'); return; }
-  document.getElementById('event-name').textContent = '';
   document.getElementById('page-title').textContent = '☸ ' + CAR + ' 車出車點名';
   document.getElementById('footer').textContent = 'AQE@2026 · 出車點名 · ' + CAR + ' 車';
   document.title = CAR + ' 車出車點名';
