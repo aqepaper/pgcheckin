@@ -1,757 +1,90 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-Hant">
 <head>
-  <base target="_top">
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>義工搭車登記</title>
-  <style>
-    :root{
-      --gold:#4f9d69;
-      --gold-dark:#2f6b45;
-      --bg:#f2faf4;
-      --card:#ffffff;
-      --border:#d7ecdc;
-      --text:#24352a;
-      --muted:#5f7d68;
-      --danger:#b5453a;
-      --ok:#3f7a52;
-      --radius:14px;
-    }
-    *{box-sizing:border-box;}
-    body{
-      margin:0;
-      background:var(--bg);
-      color:var(--text);
-      font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
-      -webkit-text-size-adjust:100%;
-    }
-    .wrap{
-      max-width:600px;
-      margin:0 auto;
-      padding:20px 16px 60px;
-      min-height:100vh;
-    }
-    header.app-header{
-      text-align:center;
-      padding:18px 0 22px;
-    }
-    header.app-header h1{
-      font-size:22px;
-      margin:0 0 4px;
-      color:var(--gold-dark);
-      letter-spacing:1px;
-    }
-    header.app-header p{
-      margin:0;
-      color:var(--muted);
-      font-size:18px;
-      line-height:1.6;
-    }
-
-    /* progress bar */
-    .progress{
-      display:flex;
-      gap:6px;
-      margin-bottom:22px;
-    }
-    .progress .seg{
-      flex:1;
-      height:6px;
-      border-radius:4px;
-      background:var(--border);
-      transition:background .3s;
-    }
-    .progress .seg.done{ background:var(--gold); }
-
-    .card{
-      background:var(--card);
-      border:1px solid var(--border);
-      border-radius:var(--radius);
-      padding:22px 18px;
-      box-shadow:0 2px 10px rgba(47,107,69,0.08);
-    }
-
-    /* 📱 手機與直立平板（螢幕寬度小於 768px）：解除桌機的寬度限制，滿版顯示 */
-    @media screen and (max-width: 768px) {
-      .wrap{
-        max-width:100% !important;
-        padding:16px 12px 60px !important;
-      }
-      .card{
-        width:100% !important;
-        padding:18px 14px !important;
-      }
-    }
-
-    .step-title{
-      font-size:22px;
-      font-weight:700;
-      margin:0 0 4px;
-      color:var(--gold-dark);
-    }
-    .step-sub{
-      font-size:18px;
-      color:var(--muted);
-      margin:0 0 18px;
-    }
-
-    label{
-      display:block;
-      font-size:18px;
-      font-weight:600;
-      margin:14px 0 6px;
-    }
-    input[type=text], select, textarea{
-      width:100%;
-      font-size:18px;
-      padding:13px 12px;
-      border:1px solid var(--border);
-      border-radius:10px;
-      background:#fbfefc;
-      color:var(--text);
-      font-family:inherit;
-    }
-    input[type=text]:focus, select:focus, textarea:focus{
-      outline:2px solid var(--gold);
-      outline-offset:1px;
-    }
-
-    .btn{
-      display:block;
-      width:100%;
-      font-size:18px;
-      font-weight:700;
-      padding:14px 16px;
-      border-radius:12px;
-      border:none;
-      cursor:pointer;
-      margin-top:18px;
-      transition:transform .05s, opacity .15s;
-    }
-    .btn:active{ transform:scale(0.98); }
-    .btn-primary{ background:var(--gold); color:#fff; }
-    .btn-primary:disabled{ opacity:.5; cursor:not-allowed; }
-    .btn-secondary{ background:#e6f5ea; color:var(--gold-dark); }
-    .btn-ghost{ background:transparent; color:var(--muted); text-decoration:underline; font-weight:500; padding:10px; }
-    .btn-danger-outline{ background:#fff; color:var(--danger); border:1px solid var(--danger); }
-
-    .candidate{
-      border:1px solid var(--border);
-      border-radius:12px;
-      padding:14px;
-      margin-bottom:10px;
-      cursor:pointer;
-      background:#fbfefc;
-    }
-    .candidate:active{ background:#e6f5ea; }
-    .candidate .name{ font-size:18px; font-weight:700; }
-    .candidate .meta{ font-size:18px; color:var(--muted); margin-top:4px; line-height:1.6; }
-
-    .info-box{
-      background:#eaf7ee;
-      border:1px solid var(--border);
-      border-radius:12px;
-      padding:16px;
-      margin-bottom:6px;
-    }
-    .info-box .row{ display:flex; justify-content:space-between; font-size:18px; padding:5px 0; }
-    .info-box .row .k{ color:var(--muted); }
-    .info-box .row .v{ font-weight:600; }
-
-    .notice-box{
-      background:#fbeaea;
-      border:1px solid #d99b96;
-      border-radius:12px;
-      padding:14px 16px;
-      margin-bottom:16px;
-      color:#7a1f1f;
-      font-size:18px;
-      font-weight:600;
-      line-height:1.7;
-    }
-
-    .event-block{
-      border:1px solid var(--border);
-      border-radius:12px;
-      padding:14px 14px 6px;
-      margin-top:16px;
-      background:#fbfefc;
-    }
-    .event-block h3{
-      font-size:22px;
-      margin:0 0 10px;
-      color:var(--gold-dark);
-    }
-    .direction-label{
-      font-size:18px;
-      font-weight:700;
-      margin:12px 0 6px;
-      color:var(--text);
-    }
-    .radio-option{
-      display:flex;
-      align-items:flex-start;
-      gap:10px;
-      padding:10px 8px;
-      border:1px solid var(--border);
-      border-radius:10px;
-      margin-bottom:8px;
-      background:#fff;
-    }
-    .radio-option input{ margin-top:3px; width:18px; height:18px; flex-shrink:0; }
-    .radio-option .opt-text{ font-size:18px; }
-    .radio-option .opt-note{ display:block; font-size:18px; color:var(--muted); margin-top:2px; }
-
-    .msg{
-      text-align:center;
-      padding:30px 10px;
-      color:var(--muted);
-      font-size:18px;
-    }
-    .msg.error{ color:var(--danger); }
-    .error-text{
-      color:var(--danger);
-      font-size:18px;
-      margin-top:8px;
-      display:none;
-    }
-
-    .summary-check{
-      text-align:center;
-      font-size:44px;
-      margin-bottom:6px;
-    }
-
-    .loading{
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      padding:40px 0;
-    }
-    .spinner{
-      width:32px; height:32px;
-      border:3px solid var(--border);
-      border-top-color:var(--gold);
-      border-radius:50%;
-      animation:spin .8s linear infinite;
-    }
-    @keyframes spin{ to{ transform:rotate(360deg); } }
-
-    .hint{ font-size:18px; color:var(--muted); margin-top:4px; }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="refresh" content="0; url=https://script.google.com/macros/s/AKfycbwTQodHM1uFomWOFzTNyLNdVD-FAjvpAAzvgOcUnnzUfcOLz1yhDlOg1usdA3F_CM8u/exec">
+<title>義工搭車登記 — 轉址中</title>
+<style>
+  :root{
+    --gold:#4f9d69;
+    --gold-dark:#2f6b45;
+    --bg:#f2faf4;
+    --card:#ffffff;
+    --border:#d7ecdc;
+    --text:#24352a;
+    --muted:#5f7d68;
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0;
+    height:100%;
+    background:var(--bg);
+    font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+    color:var(--text);
+  }
+  .wrap{
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+  }
+  .card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:36px 28px;
+    max-width:420px;
+    width:100%;
+    text-align:center;
+    box-shadow:0 2px 10px rgba(47,107,69,0.08);
+  }
+  .spinner{
+    width:40px;height:40px;
+    margin:0 auto 20px;
+    border:4px solid var(--border);
+    border-top-color:var(--gold);
+    border-radius:50%;
+    animation:spin .8s linear infinite;
+  }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+  h1{
+    font-size:20px;
+    margin:0 0 8px;
+    color:var(--gold-dark);
+  }
+  p{
+    font-size:16px;
+    color:var(--muted);
+    margin:0 0 22px;
+    line-height:1.6;
+  }
+  a.btn{
+    display:inline-block;
+    background:var(--gold);
+    color:#fff;
+    text-decoration:none;
+    font-size:16px;
+    font-weight:700;
+    padding:12px 24px;
+    border-radius:10px;
+  }
+</style>
+<script>
+  window.location.replace(
+    "https://script.google.com/macros/s/AKfycbwTQodHM1uFomWOFzTNyLNdVD-FAjvpAAzvgOcUnnzUfcOLz1yhDlOg1usdA3F_CM8u/exec"
+  );
+</script>
 </head>
 <body>
   <div class="wrap">
-    <header class="app-header">
+    <div class="card">
+      <div class="spinner"></div>
       <h1>義工搭車登記</h1>
-      <p>普高精舍<br>長期義工 ／ 總部義工<br>搭車登記系統</p>
-    </header>
-
-    <div class="progress" id="progressBar">
-      <div class="seg" data-step="1"></div>
-      <div class="seg" data-step="2"></div>
-      <div class="seg" data-step="3"></div>
-      <div class="seg" data-step="4"></div>
-    </div>
-
-    <div class="card" id="cardContainer">
-      <div class="loading"><div class="spinner"></div></div>
+      <p>正在為您轉往正式報名頁面，<br>若畫面沒有自動跳轉，請點下方按鈕。</p>
+      <a class="btn" href="https://script.google.com/macros/s/AKfycbwTQodHM1uFomWOFzTNyLNdVD-FAjvpAAzvgOcUnnzUfcOLz1yhDlOg1usdA3F_CM8u/exec">前往報名</a>
     </div>
   </div>
-
-  <script>
-    // ---------------------------------------------------------
-    // 全域狀態
-    // ---------------------------------------------------------
-    const state = {
-      systemOpen: true,
-      events: [],
-      member: null,       // {班組別,學員編號,姓名,法名,性別,組別,組號}
-      candidates: [],
-      isEditing: false,
-      existingData: null
-    };
-
-    function setProgress(step){
-      document.querySelectorAll('#progressBar .seg').forEach(seg=>{
-        seg.classList.toggle('done', Number(seg.dataset.step) <= step);
-      });
-    }
-
-    function render(html){
-      document.getElementById('cardContainer').innerHTML = html;
-    }
-
-    // ---------------------------------------------------------
-    // 初始化
-    // ---------------------------------------------------------
-    window.addEventListener('DOMContentLoaded', () => {
-      google.script.run
-        .withSuccessHandler(initData => {
-          state.systemOpen = initData.systemOpen;
-          state.events = initData.events || [];
-          if (!state.systemOpen){
-            renderClosed();
-          } else {
-            renderStep1();
-          }
-        })
-        .withFailureHandler(showFatalError)
-        .getInitData();
-    });
-
-    function showFatalError(err){
-      setProgress(0);
-      render(`<div class="msg error">系統發生錯誤，請稍後再試或聯繫承辦人員。<br><span style="font-size:18px;">${(err && err.message) || ''}</span></div>`);
-    }
-
-    function renderClosed(){
-      setProgress(0);
-      render(`<div class="msg">登記系統暫停開放<br>如有需要請聯繫承辦人員</div>`);
-    }
-
-    // ---------------------------------------------------------
-    // Step1：輸入姓名查詢
-    // ---------------------------------------------------------
-    function renderStep1(){
-      setProgress(1);
-      render(`
-        <p class="step-title">查詢身分</p>
-        <p class="step-sub">請輸入您的姓名，以帶出既有名單資料</p>
-        <label for="nameInput">姓名</label>
-        <input type="text" id="nameInput" placeholder="請輸入姓名" autofocus>
-        <div class="error-text" id="step1Error"></div>
-        <button class="btn btn-primary" id="step1Submit">查詢</button>
-      `);
-      const input = document.getElementById('nameInput');
-      const submit = document.getElementById('step1Submit');
-      const doLookup = () => {
-        const name = input.value.trim();
-        const errEl = document.getElementById('step1Error');
-        errEl.style.display = 'none';
-        if (!name){
-          errEl.textContent = '請輸入姓名';
-          errEl.style.display = 'block';
-          return;
-        }
-        submit.disabled = true;
-        submit.textContent = '查詢中...';
-        google.script.run
-          .withSuccessHandler(res => {
-            submit.disabled = false;
-            submit.textContent = '查詢';
-            handleLookupResult(res);
-          })
-          .withFailureHandler(err => { submit.disabled = false; submit.textContent = '查詢'; showFatalError(err); })
-          .lookupMember(name);
-      };
-      submit.addEventListener('click', doLookup);
-      input.addEventListener('keydown', e => { if (e.key === 'Enter') doLookup(); });
-    }
-
-    function handleLookupResult(res){
-      if (res.status === 'CLOSED'){ renderClosed(); return; }
-      if (res.status === 'NOT_FOUND'){
-        const errEl = document.getElementById('step1Error');
-        errEl.textContent = '查無此姓名，請確認輸入或聯繫承辦人員';
-        errEl.style.display = 'block';
-        return;
-      }
-      if (res.status === 'SINGLE'){
-        state.member = res.member;
-        proceedAfterIdentify();
-        return;
-      }
-      if (res.status === 'MULTIPLE'){
-        state.candidates = res.candidates;
-        renderStepFuzzy();
-      }
-    }
-
-    // ---------------------------------------------------------
-    // StepFuzzy：候選人清單
-    // ---------------------------------------------------------
-    function renderStepFuzzy(){
-      setProgress(1);
-      const cards = state.candidates.map((c, idx) => `
-        <div class="candidate" data-idx="${idx}">
-          <div class="name">${escapeHtml(c.姓名)}　${escapeHtml(c.法名 || '')}</div>
-          <div class="meta">
-            班組別：${escapeHtml(c.班組別 || '')}　學員編號：${escapeHtml(String(c.學員編號 || ''))}
-          </div>
-        </div>
-      `).join('');
-      render(`
-        <p class="step-title">找到多筆相符資料</p>
-        <p class="step-sub">請點選您本人的資料</p>
-        ${cards}
-        <button class="btn btn-ghost" id="backToStep1">← 重新輸入</button>
-      `);
-      document.querySelectorAll('.candidate').forEach(el => {
-        el.addEventListener('click', () => {
-          const c = state.candidates[Number(el.dataset.idx)];
-          google.script.run
-            .withSuccessHandler(res => {
-              if (res.status === 'SINGLE'){
-                state.member = res.member;
-                proceedAfterIdentify();
-              } else {
-                showFatalError({message:'資料確認失敗，請重新查詢'});
-              }
-            })
-            .withFailureHandler(showFatalError)
-            .confirmFuzzyMember(c.班組別, c.姓名);
-        });
-      });
-      document.getElementById('backToStep1').addEventListener('click', renderStep1);
-    }
-
-    // ---------------------------------------------------------
-    // 確認身分後：先檢查是否已登記過
-    // ---------------------------------------------------------
-    function proceedAfterIdentify(){
-      google.script.run
-        .withSuccessHandler(res => {
-          if (res.exists){
-            state.isEditing = true;
-            state.existingData = res.data;
-            renderAlreadyRegistered();
-          } else {
-            state.isEditing = false;
-            state.existingData = null;
-            renderStep2();
-          }
-        })
-        .withFailureHandler(showFatalError)
-        .checkExistingRegistration(state.member.班組別, state.member.姓名);
-    }
-
-    // ---------------------------------------------------------
-    // 已登記過：顯示現有資料 + 修改／不需修改
-    // ---------------------------------------------------------
-    function renderAlreadyRegistered(){
-      setProgress(2);
-      const d = state.existingData;
-      const tripLines = [1,2,3].map(n => {
-        const go = d[`活動${n}去程`], back = d[`活動${n}回程`];
-        if (!go && !back) return '';
-        return `<div class="row" style="align-items:flex-start;"><span class="k">${escapeHtml(eventNameFor(n))}</span><span class="v" style="text-align:right;line-height:1.6;">去程：${go||'—'}<br>回程：${back||'—'}</span></div>`;
-      }).join('');
-
-      render(`
-        <p class="step-title">您已完成登記</p>
-        <p class="step-sub">${escapeHtml(state.member.姓名)}（${escapeHtml(state.member.班組別)}）目前登記如下：</p>
-        <div class="info-box">
-          <div class="row"><span class="k">身份別</span><span class="v">${escapeHtml(d.身份別 || '')}${d.身份別備註 ? '（'+escapeHtml(d.身份別備註)+'）' : ''}</span></div>
-          <div class="row"><span class="k">發心組別</span><span class="v">${escapeHtml(d.發心組別 || '')}</span></div>
-          ${tripLines}
-          ${d.備註 ? `<div class="row"><span class="k">備註</span><span class="v">${escapeHtml(d.備註)}</span></div>` : ''}
-        </div>
-        <button class="btn btn-primary" id="editBtn">修改登記</button>
-        <button class="btn btn-secondary" id="okBtn">資料正確，不需修改</button>
-        <button class="btn btn-ghost" id="backBtn">← 返回首頁</button>
-      `);
-      document.getElementById('editBtn').addEventListener('click', renderStep2);
-      document.getElementById('okBtn').addEventListener('click', () => renderStep4({
-        身份別: d.身份別, 發心組別: d.發心組別, 備註: d.備註,
-        活動1去程: d.活動1去程, 活動1回程: d.活動1回程,
-        活動2去程: d.活動2去程, 活動2回程: d.活動2回程,
-        活動3去程: d.活動3去程, 活動3回程: d.活動3回程
-      }, false));
-      document.getElementById('backBtn').addEventListener('click', resetAll);
-    }
-
-    // ---------------------------------------------------------
-    // Step2：確認身分
-    // ---------------------------------------------------------
-    function renderStep2(){
-      setProgress(2);
-      const m = state.member;
-      render(`
-        <p class="step-title">確認身分</p>
-        <p class="step-sub">請核對以下資料是否為本人</p>
-        <div class="info-box">
-          <div class="row"><span class="k">學員編號</span><span class="v">${escapeHtml(String(m.學員編號||''))}</span></div>
-          <div class="row"><span class="k">姓名</span><span class="v">${escapeHtml(m.姓名||'')}</span></div>
-          <div class="row"><span class="k">法名</span><span class="v">${escapeHtml(m.法名||'')}</span></div>
-          <div class="row"><span class="k">班組別</span><span class="v">${escapeHtml(m.班組別||'')}</span></div>
-        </div>
-        <button class="btn btn-primary" id="confirmYes">✅ 是本人，繼續登記</button>
-        <button class="btn btn-secondary" id="confirmNo">❌ 不是我，重新輸入</button>
-      `);
-      document.getElementById('confirmYes').addEventListener('click', renderStep3);
-      document.getElementById('confirmNo').addEventListener('click', resetAll);
-    }
-
-    // ---------------------------------------------------------
-    // Step3：填寫登記內容
-    // ---------------------------------------------------------
-    function renderStep3(){
-      setProgress(3);
-      const m = state.member;
-      const existing = state.existingData; // 可能為 null
-
-      const eventBlocks = state.events.map(ev => {
-        const goOptions = ev.去程.map(v => optionHtml(ev.id, '去程', v, existing)).join('');
-        const backOptions = ev.回程.map(v => optionHtml(ev.id, '回程', v, existing)).join('');
-        return `
-          <div class="event-block">
-            <h3>${escapeHtml(ev.name)}</h3>
-            ${ev.去程.length ? `<div class="direction-label">去程</div>${goOptions}` : ''}
-            ${ev.回程.length ? `<div class="direction-label">回程</div>${backOptions}` : ''}
-          </div>
-        `;
-      }).join('');
-
-      render(`
-        <p class="step-title">填寫登記內容</p>
-        <div class="info-box" style="margin-bottom:16px;">
-          <div class="row"><span class="k">姓名</span><span class="v">${escapeHtml(m.姓名||'')}${m.法名?'　'+escapeHtml(m.法名):''}</span></div>
-          <div class="row"><span class="k">班組別</span><span class="v">${escapeHtml(m.班組別||'')}</span></div>
-        </div>
-
-        <div class="notice-box">
-          資料組會依據回程登記車次，回傳發心時間至中台系統。回程搭：<br>
-          1.長期義工車：發心至發車前30分鐘；<br>
-          2.佛巡車或大博專車：發心至發車前1小時；<br>
-          3.若以上兩項皆不符合，請於備註中說明
-        </div>
-
-        <label for="idType">身份別</label>
-        <select id="idType">
-          <option value="">請選擇</option>
-          <option value="長期義工">長期義工</option>
-          <option value="總部義工">總部義工</option>
-          <option value="其他">其他</option>
-        </select>
-        <div id="idTypeNoteWrap" style="display:none;">
-          <label for="idTypeNote">身份別備註（必填）</label>
-          <input type="text" id="idTypeNote" placeholder="請說明身份">
-        </div>
-
-        <label for="vowGroup">發心組別</label>
-        <input type="text" id="vowGroup" placeholder="請輸入發心組別">
-
-        ${eventBlocks}
-
-        <label for="remark">備註</label>
-        <textarea id="remark" rows="3" placeholder="選填，如有特殊狀況請說明"></textarea>
-
-        <div class="error-text" id="step3Error"></div>
-        <button class="btn btn-primary" id="step3Submit">送出登記</button>
-        <button class="btn btn-ghost" id="step3Back">← 返回</button>
-        ${existing ? `<button class="btn btn-danger-outline" id="cancelRegBtn" style="margin-top:10px;">取消報名</button>` : ''}
-      `);
-
-      // 帶入既有資料（修改模式）
-      if (existing){
-        document.getElementById('idType').value = existing.身份別 || '';
-        document.getElementById('vowGroup').value = existing.發心組別 || '';
-        document.getElementById('remark').value = existing.備註 || '';
-        toggleIdNote(existing.身份別 === '其他');
-        if (existing.身份別 === '其他'){
-          document.getElementById('idTypeNote').value = existing.身份別備註 || '';
-        }
-      }
-
-      document.getElementById('idType').addEventListener('change', e => {
-        toggleIdNote(e.target.value === '其他');
-      });
-
-      document.getElementById('step3Submit').addEventListener('click', submitStep3);
-      document.getElementById('step3Back').addEventListener('click', () => {
-        if (state.isEditing) renderAlreadyRegistered(); else renderStep2();
-      });
-      if (existing){
-        document.getElementById('cancelRegBtn').addEventListener('click', renderCancelConfirm);
-      }
-    }
-
-    function toggleIdNote(show){
-      document.getElementById('idTypeNoteWrap').style.display = show ? 'block' : 'none';
-    }
-
-    function optionHtml(eventId, direction, vehicle, existing){
-      const inputName = `ev_${eventId}_${direction}`;
-      const checked = existing && existing[`活動${eventId}${direction}`] === vehicle.name ? 'checked' : '';
-      return `
-        <label class="radio-option">
-          <input type="radio" name="${inputName}" value="${escapeHtml(vehicle.name)}" ${checked}>
-          <span class="opt-text">${escapeHtml(vehicle.name)}
-            ${vehicle.note ? `<span class="opt-note">${escapeHtml(vehicle.note)}</span>` : ''}
-            ${vehicle.remark ? `<span class="opt-note">${escapeHtml(vehicle.remark)}</span>` : ''}
-          </span>
-        </label>
-      `;
-    }
-
-    function submitStep3(){
-      const errEl = document.getElementById('step3Error');
-      errEl.style.display = 'none';
-
-      const idType = document.getElementById('idType').value;
-      const idTypeNote = document.getElementById('idTypeNote') ? document.getElementById('idTypeNote').value.trim() : '';
-      const vowGroup = document.getElementById('vowGroup').value.trim();
-      const remark = document.getElementById('remark').value.trim();
-
-      if (!idType){
-        errEl.textContent = '請選擇身份別';
-        errEl.style.display = 'block';
-        return;
-      }
-      if (idType === '其他' && !idTypeNote){
-        errEl.textContent = '身份別選擇「其他」時，備註為必填';
-        errEl.style.display = 'block';
-        return;
-      }
-
-      const events = state.events.map(ev => {
-        const go = document.querySelector(`input[name="ev_${ev.id}_去程"]:checked`);
-        const back = document.querySelector(`input[name="ev_${ev.id}_回程"]:checked`);
-        return { eventId: ev.id, 去程: go ? go.value : '', 回程: back ? back.value : '' };
-      });
-
-      const hasAny = events.some(e => e.去程 || e.回程);
-      if (!hasAny){
-        errEl.textContent = '請至少登記一場活動的去程或回程';
-        errEl.style.display = 'block';
-        return;
-      }
-
-      const submitBtn = document.getElementById('step3Submit');
-      submitBtn.disabled = true;
-      submitBtn.textContent = '送出中...';
-
-      const payload = {
-        班組別: state.member.班組別,
-        姓名: state.member.姓名,
-        身份別: idType,
-        身份別備註: idTypeNote,
-        發心組別: vowGroup,
-        備註: remark,
-        events: events
-      };
-
-      google.script.run
-        .withSuccessHandler(res => {
-          submitBtn.disabled = false;
-          submitBtn.textContent = '送出登記';
-          if (res.success){
-            renderStep4(res.summary, true, res.message);
-          } else {
-            errEl.textContent = res.message || '送出失敗，請再試一次';
-            errEl.style.display = 'block';
-          }
-        })
-        .withFailureHandler(err => {
-          submitBtn.disabled = false;
-          submitBtn.textContent = '送出登記';
-          showFatalError(err);
-        })
-        .submitRegistration(payload);
-    }
-
-    // ---------------------------------------------------------
-    // Step4：完成
-    // ---------------------------------------------------------
-    function renderStep4(summary, justSubmitted, message){
-      setProgress(4);
-      const tripLines = [1,2,3].map(n => {
-        const go = summary[`活動${n}去程`], back = summary[`活動${n}回程`];
-        if (!go && !back) return '';
-        return `<div class="row" style="align-items:flex-start;"><span class="k">${escapeHtml(eventNameFor(n))}</span><span class="v" style="text-align:right;line-height:1.6;">去程：${go||'—'}<br>回程：${back||'—'}</span></div>`;
-      }).join('');
-
-      render(`
-        <div class="summary-check">${justSubmitted ? '✅' : '📋'}</div>
-        <p class="step-title" style="text-align:center;">${justSubmitted ? (message || '登記完成') : '登記內容如下'}</p>
-        <p class="step-sub" style="text-align:center;">以最後一次送出為準</p>
-        <div class="info-box">
-          <div class="row"><span class="k">姓名</span><span class="v">${escapeHtml(state.member.姓名||'')}</span></div>
-          <div class="row"><span class="k">法名</span><span class="v">${escapeHtml(state.member.法名||'')}</span></div>
-          <div class="row"><span class="k">身份別</span><span class="v">${escapeHtml(summary.身份別||'')}</span></div>
-          <div class="row"><span class="k">發心組別</span><span class="v">${escapeHtml(summary.發心組別||'')}</span></div>
-          ${tripLines}
-          ${summary.備註 ? `<div class="row"><span class="k">備註</span><span class="v">${escapeHtml(summary.備註)}</span></div>` : ''}
-        </div>
-        <button class="btn btn-primary" id="backHome">← 返回首頁</button>
-      `);
-      document.getElementById('backHome').addEventListener('click', resetAll);
-    }
-
-    // ---------------------------------------------------------
-    // 取消報名：二次確認
-    // ---------------------------------------------------------
-    function renderCancelConfirm(){
-      render(`
-        <p class="step-title">確定要取消報名嗎？</p>
-        <p class="step-sub">取消後這筆登記資料將被移除，無法復原。如需重新登記，請重新查詢並填寫。</p>
-        <div class="info-box">
-          <div class="row"><span class="k">姓名</span><span class="v">${escapeHtml(state.member.姓名||'')}</span></div>
-          <div class="row"><span class="k">班組別</span><span class="v">${escapeHtml(state.member.班組別||'')}</span></div>
-        </div>
-        <div class="error-text" id="cancelError"></div>
-        <button class="btn btn-danger-outline" id="confirmCancelBtn">是，取消報名</button>
-        <button class="btn btn-ghost" id="backToStep3">← 不要，返回</button>
-      `);
-      document.getElementById('backToStep3').addEventListener('click', renderStep3);
-      document.getElementById('confirmCancelBtn').addEventListener('click', () => {
-        const btn = document.getElementById('confirmCancelBtn');
-        btn.disabled = true;
-        btn.textContent = '處理中...';
-        google.script.run
-          .withSuccessHandler(res => {
-            if (res.success){
-              renderCancelled();
-            } else {
-              btn.disabled = false;
-              btn.textContent = '是，取消報名';
-              const errEl = document.getElementById('cancelError');
-              errEl.textContent = res.message || '取消失敗，請再試一次';
-              errEl.style.display = 'block';
-            }
-          })
-          .withFailureHandler(err => {
-            btn.disabled = false;
-            btn.textContent = '是，取消報名';
-            showFatalError(err);
-          })
-          .cancelRegistration(state.member.班組別, state.member.姓名);
-      });
-    }
-
-    function renderCancelled(){
-      render(`
-        <div class="summary-check">🗑️</div>
-        <p class="step-title" style="text-align:center;">已取消報名</p>
-        <p class="step-sub" style="text-align:center;">如需重新登記，可回首頁重新查詢填寫</p>
-        <button class="btn btn-primary" id="backHomeAfterCancel">← 返回首頁</button>
-      `);
-      document.getElementById('backHomeAfterCancel').addEventListener('click', resetAll);
-    }
-
-    // ---------------------------------------------------------
-    // 共用
-    // ---------------------------------------------------------
-    function resetAll(){
-      state.member = null;
-      state.candidates = [];
-      state.isEditing = false;
-      state.existingData = null;
-      renderStep1();
-    }
-
-    function eventNameFor(n){
-      const ev = state.events.find(e => e.id === String(n));
-      return ev ? ev.name : `活動${n}`;
-    }
-
-    function escapeHtml(str){
-      return String(str == null ? '' : str)
-        .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-        .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-    }
-  </script>
 </body>
 </html>
