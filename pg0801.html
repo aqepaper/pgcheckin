@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+  <title>出車表異動申請</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700;900&family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #111122;
+      --gold: #aa7a00;
+      --gold-light: #d4a017;
+      --gold-pale: #fbf7ee;
+      --gold-border: #dfbe40;
+      --maroon: #801818;
+      --cream: #f7f4ed;
+      --gray: #333333;
+      --gray-light: #e2e2e2;
+      --white: #ffffff;
+      --green: #0f522e;
+      --green-pale: #eaf5ed;
+      --green-border: #a3d9b9;
+      --red: #b21822;
+      --red-pale: #fff2f2;
+      --red-border: #ffccd0;
+      --amber: #b85c00;
+      --amber-pale: #fff7e8;
+      --amber-border: #f3d9a8;
+      --teal: #1e4238;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; -webkit-text-size-adjust: 100%; }
+    body {
+      -webkit-font-smoothing: antialiased;
+      -webkit-tap-highlight-color: transparent;
+      font-family: 'Noto Sans TC', sans-serif;
+      background: var(--cream); color: var(--ink);
+      min-height: 100vh; max-width: 480px; margin: 0 auto;
+      box-shadow: 0 0 40px rgba(0,0,0,0.12); line-height: 1.6;
+    }
+
+    #loading-bar {
+      display: none; position: fixed; top: 0; left: 0; right: 0; height: 5px;
+      background: linear-gradient(90deg,var(--gold),var(--gold-light),var(--gold));
+      background-size: 200% 100%; animation: shimmer 1.2s infinite; z-index: 9999;
+    }
+    @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+    /* ── 置頂 ── */
+    #sticky-top { position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+    header {
+      background: #fdf8f0; padding: 8px 60px 10px 14px; text-align: center;
+      border-bottom: 2px solid #e8d9c0; position: relative;
+    }
+    #event-name {
+      font-family: 'Noto Serif TC',serif; font-size: .85rem; font-weight: 700;
+      color: #a8916c; letter-spacing: .06em; line-height: 1.4; min-height: 1em;
+    }
+    header h1 {
+      font-family: 'Noto Serif TC',serif; font-size: 1.25rem; font-weight: 900;
+      letter-spacing: .04em; color: var(--maroon); line-height: 1.3;
+    }
+    #logout-btn {
+      display: none; position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+      width: 40px; height: 40px; border-radius: 50%;
+      background: linear-gradient(135deg,#fffbf3,#f3e5cc);
+      border: 1.5px solid var(--gold-border);
+      font-size: 16px; cursor: pointer;
+      align-items: center; justify-content: center;
+      box-shadow: 0 2px 5px rgba(184,134,11,0.15);
+      -webkit-tap-highlight-color: transparent;
+    }
+    #logout-btn.show { display: flex; }
+    #logout-btn:active { transform: translateY(-50%) scale(0.9); background: #f3e5cc; }
+
+    /* ── 統計 ── */
+    #top-stats {
+      display: none; grid-template-columns: repeat(3,1fr);
+      background: #faf7f2; padding: 10px; gap: 8px;
+      border-bottom: 2px solid #e8d9c0;
+    }
+    #top-stats.show { display: grid; }
+    .top-stat-box {
+      background: #fff; border-radius: 12px; padding: 8px 4px;
+      text-align: center; border: 2px solid #ede0cc;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.02);
+    }
+    .top-stat-box .num {
+      font-size: 16px; font-weight: 900;
+      font-family: 'Noto Serif TC',serif; line-height: 1;
+    }
+    .top-stat-box .lbl { font-size: 15px; color: #5a4020; margin-top: 4px; font-weight: 700; }
+    .num-green { color: var(--green); }
+    .num-red   { color: var(--red); }
+    .num-amber { color: var(--amber); }
+    .num-gray  { color: #5a4020; }
+
+    /* ── 主體 ── */
+    #main-body { padding: 14px 14px 60px; }
+
+    /* ── 登入 ── */
+    .login-card {
+      background: #fdf9f3; border-radius: 16px; padding: 20px 18px;
+      border: 2px solid #ede0cc; box-shadow: 0 4px 12px rgba(90,64,32,0.06);
+      margin-bottom: 16px;
+    }
+    .login-title {
+      font-family: 'Noto Serif TC',serif; font-size: 1.1rem; font-weight: 900;
+      color: var(--maroon); margin-bottom: 14px; text-align: center;
+    }
+    .pin-field {
+      width: 100%; padding: 14px; font-size: 16px; text-align: center; letter-spacing: .12em;
+      border: 2.5px solid #c8b48a; border-radius: 14px;
+      background: var(--gold-pale); color: var(--ink);
+      font-family: 'Noto Serif TC',serif; font-weight: 900;
+      outline: none; -webkit-appearance: none;
+    }
+    .pin-field:focus { border-color: var(--gold); box-shadow: 0 0 0 4px rgba(184,134,11,.15); background:#fff; }
+    .pin-submit {
+      width: 100%; border: none; border-radius: 14px; padding: 15px;
+      font-family: 'Noto Serif TC',serif; font-size: 16px; letter-spacing: 4px; font-weight: 900;
+      background: linear-gradient(135deg,var(--teal),#1e4238); color: #fff;
+      box-shadow: 0 4px 15px rgba(45,93,79,.3);
+      cursor: pointer; transition: all .2s; margin-top: 14px;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .pin-submit:active { transform: scale(.98); }
+    .pin-submit.gold { background: linear-gradient(135deg,#8a6510,var(--gold)); box-shadow: 0 4px 15px rgba(170,122,0,.3); }
+    .pin-error { text-align: center; font-size: 16px; color: var(--red);
+      min-height: 24px; margin-top: 10px; font-weight: 700; }
+    .pin-error.ok { color: var(--green); }
+
+
+    /* ── 區段標題與篩選 ── */
+    .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .section-header h2 { font-family: 'Noto Serif TC',serif; font-size: 1.2rem; font-weight: 900; color: var(--maroon); }
+    .filter-bar { display: flex; gap: 6px; }
+    .filter-btn {
+      padding: 10px 14px; font-size: 16px; border-radius: 10px;
+      border: 2px solid #b8a080; background: var(--white); color: var(--ink);
+      font-family: 'Noto Sans TC',sans-serif; font-weight: 700;
+      cursor: pointer; -webkit-tap-highlight-color: transparent; white-space: nowrap;
+      transition: all 0.2s;
+    }
+    .filter-btn.active { border-color: var(--maroon); background: #fff5f5; color: var(--maroon);
+      box-shadow: 0 2px 6px rgba(128,24,24,0.15); }
+
+    /* ── 名單卡片 ── */
+    .cards-grid { display: flex; flex-direction: column; gap: 10px; }
+    .card {
+      background: #fdf9f3; border-radius: 16px; padding: 14px 16px;
+      box-shadow: 0 4px 12px rgba(90,64,32,0.06); border: 2px solid #ede0cc;
+      cursor: pointer; -webkit-tap-highlight-color: transparent;
+      transition: all 0.2s ease; display: flex; flex-direction: column; gap: 8px;
+    }
+    .card:active { transform: scale(0.98); box-shadow: 0 2px 6px rgba(0,0,0,.05); opacity: .9; }
+    .card.has-pending { border-color: var(--gold-border); background: linear-gradient(135deg,#fefbf3,#fdf7e8); }
+    .card.core-leader { border: 2px solid var(--gold-border); background: linear-gradient(135deg,#fefbf3,#fdf7e8); }
+
+    .card-row1 { display: flex; align-items: center; gap: 12px; }
+    .card-order {
+      font-family: 'Noto Serif TC',serif; font-size: 16px; font-weight: 900; color: var(--maroon);
+      background: #fdf2f2; padding: 2px 8px; border-radius: 6px; min-width: 38px; text-align: center;
+    }
+    .card-name   { font-size: 16px; font-weight: 700; color: var(--ink); }
+    .card-dharma { font-size: 16px; color: #555; font-weight: 500;
+      background: #efe8dc; padding: 2px 8px; border-radius: 4px; }
+    .card-edit { margin-left: auto; font-size: 15px; font-weight: 900; color: var(--maroon);
+      background: #fdf2f2; border: 1.5px solid #e8c0c0; padding: 5px 12px; border-radius: 20px; white-space: nowrap; }
+    .card-row2 { display: flex; align-items: center; flex-wrap: wrap; gap: 6px;
+      border-top: 1px dashed #efe8dc; padding-top: 8px; }
+
+    .badge { display: inline-block; padding: 5px 12px; border-radius: 20px; font-size: 16px; font-weight: 900; }
+    .badge-car  { background: var(--green-pale); color: var(--green); border: 1px solid var(--green-border); }
+    .badge-self { background: #f0f0f0; color: #444; border: 1px solid #ccc; }
+    .badge-pend { background: var(--amber-pale); color: var(--amber); border: 1px solid var(--amber-border); }
+    .badge-ok   { background: var(--green-pale); color: var(--green); border: 1px solid var(--green-border); }
+    .badge-rej  { background: var(--red-pale); color: var(--red); border: 1px solid var(--red-border); }
+
+    .tag { display: inline-block; font-size: 14px; padding: 3px 8px; border-radius: 8px; font-weight: 700; }
+    .tag-m    { background: #e3f2fd; color: #0d47a1; }
+    .tag-f    { background: #fce4ec; color: #880e4f; }
+    .tag-unit { background: #f3e8ff; color: #5b21b6; }
+    .tag-role { background: #fdf2f2; color: var(--maroon); border: 1px solid #e8c0c0; }
+
+    /* ── 申請紀錄卡片 ── */
+    .req-card {
+      background: #fdf9f3; border-radius: 16px; padding: 14px 16px; margin-bottom: 10px;
+      border: 2px solid #ede0cc; box-shadow: 0 4px 12px rgba(90,64,32,0.06);
+    }
+    .req-card.st-pend { border-color: var(--amber-border); }
+    .req-card.st-ok   { border-color: var(--green-border); }
+    .req-card.st-rej  { border-color: var(--red-border); background: #fffafa; }
+    .req-head { display: flex; align-items: center; gap: 10px; }
+    .req-name { font-size: 16px; font-weight: 900; }
+    .req-car  { font-size: 15px; color: #5a4020; font-weight: 700;
+      background: #f5ecd8; padding: 2px 8px; border-radius: 6px; }
+    .req-badge { margin-left: auto; }
+    .req-body { border-top: 1px dashed #efe8dc; margin-top: 8px; padding-top: 8px;
+      font-size: 16px; color: #4a3a28; }
+    .req-body b { color: var(--maroon); }
+    .req-meta { font-size: 14px; color: #998866; margin-top: 4px; }
+    .req-note { margin-top: 6px; background: var(--gold-pale); border: 1px dashed var(--gold-border);
+      border-radius: 8px; padding: 6px 10px; font-size: 16px; color: #6a4a10; }
+
+    /* ── 管理者處理區 ── */
+    .ops { border-top: 2px dashed #e8d9c0; margin-top: 12px; padding-top: 12px; }
+    .ops label { display: block; font-size: 16px; font-weight: 700; color: #5a4020; margin: 10px 0 5px; }
+    .ops select, .ops input[type=text] {
+      width: 100%; padding: 12px; font-size: 16px; font-family: 'Noto Sans TC',sans-serif;
+      border: 2px solid #b8a080; border-radius: 10px; background: #fff; color: var(--ink);
+      outline: none; -webkit-appearance: none; font-weight: 600;
+    }
+    .ops select:focus, .ops input:focus { border-color: var(--gold); }
+    .ops-msg { min-height: 22px; font-size: 16px; font-weight: 700; text-align: center; margin-top: 8px; }
+    .ops-msg.ok { color: var(--green); } .ops-msg.err { color: var(--red); }
+
+    /* ── 通用按鈕 ── */
+    .btn {
+      display: inline-block; padding: 15px 18px; min-height: 44px; border-radius: 14px; border: none;
+      font-family: 'Noto Sans TC',sans-serif; font-weight: 900; font-size: 16px;
+      cursor: pointer; transition: opacity .15s; text-align: center;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn:active { opacity: .72; }
+    .btn-green   { background: var(--green); color: #fff; }
+    .btn-red     { background: var(--red); color: #fff; }
+    .btn-gray    { background: #555; color: #fff; }
+    .btn-outline { background: var(--white); border: 2.5px solid var(--maroon); color: var(--maroon); }
+    .btn-gold-outline { background: var(--white); border: 2px dashed var(--gold); color: #8a6510; }
+    .btn-full    { width: 100%; display: block; }
+    .flex-gap { display: flex; gap: 10px; }
+    .flex-gap .btn { flex: 1; }
+
+    /* ══ Modal / Bottom Sheet ══ */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.6); z-index: 500;
+      align-items: flex-end; justify-content: center;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal-sheet {
+      background: #fff; border-radius: 24px 24px 0 0;
+      padding: 0 18px 36px; width: 100%; max-width: 480px;
+      box-shadow: 0 -8px 40px rgba(0,0,0,.25);
+      animation: slideUp .22s ease; max-height: 92vh; overflow-y: auto;
+    }
+    @keyframes slideUp{from{transform:translateY(60px);opacity:0}to{transform:translateY(0);opacity:1}}
+    .sheet-handle { width: 50px; height: 6px; background: #ccc; border-radius: 4px; margin: 16px auto 20px; }
+    .sheet-title {
+      font-family: 'Noto Serif TC',serif; font-size: 1.3rem; font-weight: 900;
+      color: var(--maroon); text-align: center; margin-bottom: 6px;
+    }
+    .sheet-sub { text-align: center; font-size: 16px; color: #887050; margin-bottom: 16px; font-weight: 700; }
+    .form-label { font-size: 16px; font-weight: 900; color: #5a4020; margin: 14px 0 6px; }
+    .form-select, .form-textarea {
+      width: 100%; padding: 14px; font-size: 16px; font-family: 'Noto Sans TC',sans-serif;
+      border: 2px solid #b8a080; border-radius: 12px; background: #fff; color: var(--ink);
+      outline: none; -webkit-appearance: none; font-weight: 600;
+    }
+    .form-select:focus, .form-textarea:focus { border-color: var(--gold); box-shadow: 0 0 0 4px rgba(184,134,11,.12); }
+    .form-textarea { min-height: 96px; resize: vertical; line-height: 1.6; }
+    .form-msg { min-height: 24px; text-align: center; font-size: 16px; font-weight: 700; margin-top: 10px; }
+    .form-msg.err { color: var(--red); } .form-msg.ok { color: var(--green); }
+
+    /* 確認摘要 */
+    .confirm-box {
+      background: var(--gold-pale); border: 2px solid var(--gold-border);
+      border-radius: 14px; padding: 16px; margin-top: 6px;
+      font-size: 16px; line-height: 2;
+    }
+    .confirm-box b { color: var(--maroon); }
+    .confirm-hint { text-align: center; font-size: 16px; color: #887050; font-weight: 700; margin-top: 10px; }
+
+    /* 回頂按鈕 */
+    #back-to-top {
+      display: none; position: fixed; bottom: 28px; right: 18px;
+      width: 48px; height: 48px; border-radius: 50%;
+      background: var(--maroon); color: #fff;
+      border: none; font-size: 16px; font-weight: 900;
+      cursor: pointer; z-index: 400;
+      box-shadow: 0 4px 14px rgba(0,0,0,.25);
+      -webkit-tap-highlight-color: transparent;
+    }
+    #back-to-top.show { display: flex; align-items: center; justify-content: center; }
+
+    #toast {
+      position: fixed; bottom: 36px; left: 50%;
+      transform: translateX(-50%) translateY(120px);
+      background: #111; color: #fff; padding: 14px 26px;
+      border-radius: 40px; font-size: 16px; font-weight: 700;
+      z-index: 9999; transition: transform .28s;
+      white-space: nowrap; box-shadow: 0 8px 28px rgba(0,0,0,.35);
+    }
+    #toast.show { transform: translateX(-50%) translateY(0); }
+
+    .leader-section { margin-bottom: 20px; }
+    .leader-section-title {
+      font-family: 'Noto Serif TC',serif; font-size: 1.05rem; font-weight: 900;
+      color: var(--maroon); margin-bottom: 12px; padding-bottom: 8px;
+      border-bottom: 2px solid #f5e6cc;
+    }
+    .empty-note { text-align: center; color: #998866; font-size: 16px; padding: 24px 0; font-weight: 700; }
+    .mt-3 { margin-top: 14px; } .mb-3 { margin-bottom: 14px; }
+    .hidden { display: none !important; }
+    footer { text-align: center; padding: 18px 0 36px; color: #bbb; font-size: 13px; }
+    /* 齒輪按鈕 */
+    #admin-gear {
+      position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+      width: 40px; height: 40px; border-radius: 50%;
+      background: linear-gradient(135deg,#fffbf3,#f3e5cc);
+      border: 1.5px solid var(--gold-border);
+      font-size: 16px; cursor: pointer; display: flex;
+      align-items: center; justify-content: center;
+      box-shadow: 0 2px 5px rgba(184,134,11,0.15);
+      -webkit-tap-highlight-color: transparent;
+      transition: all 0.2s;
+    }
+    #admin-gear:active { transform: translateY(-50%) scale(0.9); }
+    #admin-gear.hidden { display: none !important; }
+  </style>
+</head>
+<body>
+<div id="loading-bar"></div>
+
+<div id="sticky-top">
+  <header>
+    <div id="event-name"></div>
+    <h1 id="page-title">☸ 出車表異動申請</h1>
+    <button id="admin-gear" onclick="openAdminSheet()" title="管理者">⚙️</button>
+    <button id="logout-btn" onclick="location.reload()" title="登出">登出</button>
+  </header>
+</div>
+
+<div id="main-body">
+
+  <!-- ════ 登入 ════ -->
+  <div id="login-view">
+
+    <!-- ── 操作步驟說明 ── -->
+    <div style="background:#fdf9f3;border-radius:16px;padding:18px 16px;border:2px solid #ede0cc;box-shadow:0 4px 12px rgba(90,64,32,0.06);margin-bottom:16px;">
+      <div style="font-family:'Noto Serif TC',serif;font-size:1rem;font-weight:900;color:#801818;margin-bottom:14px;text-align:center;">📋 異動申請步驟說明</div>
+
+      <div style="display:flex;flex-direction:column;gap:10px;">
+
+        <div style="display:flex;gap:12px;align-items:flex-start;">
+          <div style="min-width:28px;height:28px;border-radius:50%;background:#801818;color:#fff;font-weight:900;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">1</div>
+          <div>
+            <div style="font-weight:900;font-size:15px;color:#3a2510;">登入</div>
+            <div style="font-size:14px;color:#6a5030;line-height:1.6;">輸入本人手機後6碼，系統自動帶入您所屬車次的乘客名單。</div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:12px;align-items:flex-start;">
+          <div style="min-width:28px;height:28px;border-radius:50%;background:#801818;color:#fff;font-weight:900;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">2</div>
+          <div>
+            <div style="font-weight:900;font-size:15px;color:#3a2510;">選擇申請對象</div>
+            <div style="font-size:14px;color:#6a5030;line-height:1.6;">在名單中點選要申請異動的乘客，彈出申請表單。</div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:12px;align-items:flex-start;">
+          <div style="min-width:28px;height:28px;border-radius:50%;background:#801818;color:#fff;font-weight:900;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">3</div>
+          <div>
+            <div style="font-weight:900;font-size:15px;color:#3a2510;">填寫異動類型與說明</div>
+            <div style="font-size:14px;color:#6a5030;line-height:1.6;">選擇異動類型，依需求填寫說明（部分類型為必填），確認後送出。</div>
+            <div style="margin-top:6px;background:#fff7e8;border:1px solid #f3d9a8;border-radius:8px;padding:8px 10px;font-size:13px;color:#b85c00;line-height:1.6;">
+              同車申請-親眷／非親眷：請填寫想同車的對象姓名<br>
+              取消回山：請填寫取消原因<br>
+              其他：請說明需求
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:12px;align-items:flex-start;">
+          <div style="min-width:28px;height:28px;border-radius:50%;background:#801818;color:#fff;font-weight:900;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">4</div>
+          <div>
+            <div style="font-weight:900;font-size:15px;color:#3a2510;">等待幹部審核</div>
+            <div style="font-size:14px;color:#6a5030;line-height:1.6;">送出後進入「待處理」狀態，幹部審核後系統自動更新出車表，結果可在本頁下方「本車申請紀錄」查看。</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="login-card">
+      <div class="login-title">🚌 領隊／副領隊登入</div>
+      <input type="tel" class="pin-field" id="phone-input" inputmode="numeric"
+        autocomplete="off" placeholder="請輸入手機後6碼"
+        onkeydown="if(event.key==='Enter')leaderLogin()">
+      <button class="pin-submit" onclick="leaderLogin()">進　入</button>
+      <div class="pin-error" id="login-err"></div>
+    </div>
+
+  </div>
+
+  <!-- ════ 領隊主頁 ════ -->
+  <div id="leader-view" class="hidden">
+
+    <div class="section-header">
+      <h2>📋 本車名單</h2>
+      <div class="filter-bar">
+        <button class="filter-btn active" id="filter-all" onclick="setFilter('all')">全部</button>
+        <button class="filter-btn" id="filter-req" onclick="setFilter('req')">有申請</button>
+        <button class="filter-btn" onclick="refreshLeader()">🔄</button>
+      </div>
+    </div>
+    <div id="cards" class="cards-grid"></div>
+
+    <div class="leader-section" style="margin-top:24px">
+      <div class="leader-section-title">🧾 本車申請紀錄</div>
+      <div id="my-req-list"></div>
+    </div>
+  </div>
+
+  <!-- ════ 管理者主頁 ════ -->
+  <div id="admin-view" class="hidden">
+    <div class="section-header">
+      <h2>⚙️ 異動審核</h2>
+      <div class="filter-bar">
+        <button class="filter-btn active" id="afilter-pend" onclick="setAdminFilter('pend')">待處理</button>
+        <button class="filter-btn" id="afilter-all" onclick="setAdminFilter('all')">全部</button>
+        <button class="filter-btn" onclick="loadAdmin()">🔄</button>
+      </div>
+    </div>
+    <div id="admin-list"></div>
+    <div style="margin-top:24px;padding-top:16px;border-top:2px dashed #e8d9c0">
+      <button class="btn btn-red btn-full" onclick="clearAllRequests()">
+        🗑 清除所有異動紀錄
+      </button>
+    </div>
+  </div>
+
+</div>
+
+<footer>出車表異動申請系統</footer>
+<div id="toast"></div>
+<button id="back-to-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<!-- ════ 異動申請 Sheet ════ -->
+<div class="modal-overlay" id="req-sheet">
+  <div class="modal-sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title" id="req-title">📝 異動申請</div>
+    <div class="sheet-sub" id="req-sub"></div>
+
+    <div id="req-form-box">
+      <div class="form-label">異動類型</div>
+      <select class="form-select" id="req-type" onchange="onTypeChange()">
+        <option value="" disabled selected>請選擇</option>
+        <option value="同車申請-親眷">同車申請-親眷</option>
+        <option value="同車申請-非親眷">同車申請-非親眷</option>
+        <option value="轉移到其他梯次、車次">轉移到其他梯次、車次</option>
+        <option value="更改來回交通方式(大車或自行)">更改來回交通方式(大車或自行)</option>
+        <option value="取消回山">取消回山</option>
+        <option value="其他">其他</option>
+      </select>
+      <div class="form-label" id="detail-label">原因／說明（選填）</div>
+      <textarea class="form-textarea" id="req-detail"></textarea>
+      <div class="flex-gap mt-3">
+        <button class="btn btn-gray" onclick="closeReqSheet()">取消</button>
+        <button class="btn btn-outline" onclick="preConfirm()">下一步</button>
+      </div>
+    </div>
+
+    <div id="confirm-box-wrap" class="hidden">
+      <div class="confirm-box" id="confirm-text"></div>
+      <div class="confirm-hint">請確認以上內容無誤，送出後由管理者審核</div>
+      <div class="flex-gap mt-3">
+        <button class="btn btn-gray" onclick="backToEdit()">返回修改</button>
+        <button class="btn btn-green" onclick="sendRequest()">確認送出</button>
+      </div>
+    </div>
+    <div class="form-msg" id="req-msg"></div>
+  </div>
+</div>
+
+
+<!-- ════ 管理者 Sheet ════ -->
+<div class="modal-overlay" id="admin-sheet">
+  <div class="modal-sheet">
+    <div class="sheet-handle"></div>
+    <div id="admin-login-panel">
+      <div class="sheet-title">⚙️ 管理者登入</div>
+      <input type="tel" class="form-select" id="admin-input" inputmode="numeric"
+        autocomplete="off" placeholder="••••"
+        style="text-align:center;font-size: 16px;letter-spacing:.4em;font-weight:900;"
+        onkeydown="if(event.key==='Enter')adminLogin()">
+      <div class="flex-gap mt-3">
+        <button class="btn btn-gray" onclick="closeAdminSheet()">取消</button>
+        <button class="btn btn-green" onclick="adminLogin()">進　入</button>
+      </div>
+      <div class="form-msg err" id="admin-err" style="margin-top:10px"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ════ 設定 ════ */
+// 這個 GAS 專案同時提供頁面與API，兩者共用同一個 /exec 網址
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbyEbOWgCia474i1bRXW21UqreDnPxW5cqtjezEUtDs3AvlZ0LEL0ybstR6UR8sMje006A/exec';
+
+const TYPE_OPTIONS = ['同車申請-親眷','同車申請-非親眷','轉移到其他梯次、車次','更改來回交通方式(大車或自行)','取消回山','其他'];
+// 審核時要選「單一目標車號」的類型（去回都改成同一台車）
+const SINGLE_CAR_TYPES = ['同車申請-親眷','同車申請-非親眷','轉移到其他梯次、車次'];
+// 審核時要分別選「去程／回程」交通方式的類型
+const LEG_TYPES = ['更改來回交通方式(大車或自行)'];
+// 申請時必填原因／說明的類型
+const NEED_REASON = ['同車申請-親眷','同車申請-非親眷','取消回山','其他'];
+
+const S = { role:null, name:'', car:'', cars:[], roster:[], adminCode:'',
+            reqTarget:null, sheetUrl:'', filter:'all', adminFilter:'pend',
+            myReqs:[], allReqs:[] };
+let myReqMap = {};
+
+/* ════ 基礎 ════ */
+function $(id){ return document.getElementById(id); }
+function api(params){
+  $('loading-bar').style.display = 'block';
+  // 寫入類action用POST，讀取類用GET（加防快取參數）
+  const writeActions = ['submit','process'];
+  if (writeActions.includes(params.action)) {
+    return fetch(GAS_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams(params).toString()
+    }).then(r => r.json())
+      .finally(() => { $('loading-bar').style.display = 'none'; });
+  }
+  const url = GAS_URL + '?' + new URLSearchParams({ ...params, _:Date.now() }).toString();
+  return fetch(url, { cache:'no-store' }).then(r => r.json())
+    .finally(() => { $('loading-bar').style.display = 'none'; });
+}
+function toast(msg){
+  const t = $('toast'); t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+window.addEventListener('scroll', () => {
+  $('back-to-top').classList.toggle('show', window.scrollY > 400);
+});
+
+/* ════ 登入 ════ */
+function leaderLogin(){
+  const phone = $('phone-input').value.trim();
+  const err = $('login-err');
+  if (!phone) { err.textContent = '請輸入手機後6碼'; return; }
+  err.textContent = '查詢中…'; err.className = 'pin-error ok';
+  api({ action:'login', phone }).then(d => {
+    if (!d.ok) { err.textContent = d.msg; err.className = 'pin-error'; return; }
+    Object.assign(S, { role:d.role, name:d.name, car:d.car, cars:d.cars,
+                       roster:d.roster, sheetUrl:d.sheetUrl || '', eventName:d.eventName || '' });
+    $('event-name').textContent = S.eventName || '';
+    $('page-title').textContent = '☸ ' + S.car + ' 車異動申請';
+    $('logout-btn').classList.add('show');
+    $('admin-gear').classList.add('hidden');
+    $('login-view').classList.add('hidden');
+    $('leader-view').classList.remove('hidden');
+    renderRoster(); loadMyRequests();
+  }).catch(() => { err.textContent = '連線失敗，請稍後再試'; err.className = 'pin-error'; });
+}
+
+function openAdminSheet(){
+  $('admin-input').value = '';
+  $('admin-err').textContent = '';
+  $('admin-sheet').classList.add('show');
+  setTimeout(() => $('admin-input').focus(), 120);
+}
+function closeAdminSheet(){ $('admin-sheet').classList.remove('show'); }
+
+function adminLogin(){
+  const code = $('admin-input').value.trim();
+  const err = $('admin-err');
+  if (!code) { err.textContent = '請輸入管理者代碼'; return; }
+  err.textContent = '驗證中…'; err.className = 'form-msg ok';
+  api({ action:'adminLogin', code }).then(d => {
+    if (!d.ok) { err.textContent = d.msg; err.className = 'form-msg err'; return; }
+    closeAdminSheet();
+    S.adminCode = code; S.cars = d.cars; S.eventName = d.eventName || '';
+    $('event-name').textContent = S.eventName || '';
+    $('page-title').textContent = '☸ 異動審核管理';
+    $('logout-btn').classList.add('show');
+    $('admin-gear').classList.add('hidden');
+    $('login-view').classList.add('hidden');
+    $('admin-view').classList.remove('hidden');
+    loadAdmin();
+  }).catch(() => { err.textContent = '連線失敗，請稍後再試'; err.className = 'form-msg err'; });
+}
+
+/* ════ 領隊：名單 ════ */
+function renderRoster(){
+  const box = $('cards');
+  let list = S.roster;
+  if (S.filter === 'req') list = list.filter(m => myReqMap[m.name]);
+  if (!list.length) { box.innerHTML = '<div class="empty-note">沒有符合的名單</div>'; return; }
+  box.innerHTML = list.map(m => {
+    const pend = myReqMap[m.name] || 0;
+    const gTag = m.gender === '男' ? '<span class="tag tag-m">男</span>' : '<span class="tag tag-f">女</span>';
+    const roleTag = m.role ? `<span class="tag tag-role">${m.role}</span>` : '';
+    return `<div class="card ${pend ? 'has-pending' : ''} ${m.role ? 'core-leader' : ''}"
+                 id="card-${m.seq}" onclick='openReqSheet(${JSON.stringify(String(m.name))})'>
+      <div class="card-row1">
+        <div class="card-order">${m.seq}</div>
+        <div class="card-name">${m.name}</div>
+        ${m.dharma ? `<div class="card-dharma">${m.dharma}</div>` : ''}
+        <div class="card-edit">✏️ 異動</div>
+      </div>
+      <div class="card-row2">
+        ${gTag}${roleTag}
+        <span class="tag tag-unit">${m.group || ''}</span>
+        <span class="badge ${String(m.go)==='自行'?'badge-self':'badge-car'}">去 ${m.go || '—'}</span>
+        <span class="badge ${String(m.back)==='自行'?'badge-self':'badge-car'}">回 ${m.back || '—'}</span>
+        ${pend ? `<span class="badge badge-pend">待處理 ${pend}</span>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function setFilter(f){
+  S.filter = f;
+  $('filter-all').classList.toggle('active', f === 'all');
+  $('filter-req').classList.toggle('active', f === 'req');
+  renderRoster();
+}
+function refreshLeader(){
+  api({ action:'roster', car:S.car }).then(d => {
+    if (d.ok) { S.roster = d.roster; renderRoster(); }
+    loadMyRequests();
+    toast('已更新');
+  });
+}
+
+/* ════ 領隊：申請 ════ */
+function openReqSheet(name){
+  S.reqTarget = name;
+  $('req-title').textContent = '📝 異動申請：' + name;
+  $('req-sub').textContent = S.car + ' 車　由 ' + S.name + '（' + S.role + '）提出';
+  $('req-type').selectedIndex = 0;
+  $('req-detail').value = '';
+  $('req-msg').textContent = '';
+  backToEdit();
+  onTypeChange();
+  $('req-sheet').classList.add('show');
+}
+function closeReqSheet(){ $('req-sheet').classList.remove('show'); }
+$('req-sheet').addEventListener('click', e => { if (e.target === $('req-sheet')) closeReqSheet(); });
+$('admin-sheet').addEventListener('click', e => { if (e.target === $('admin-sheet')) closeAdminSheet(); });
+
+function onTypeChange(){
+  const t = $('req-type').value;
+  $('detail-label').textContent = NEED_REASON.includes(t) ? '原因／說明（必填）' : '原因／說明（選填）';
+  $('req-detail').placeholder =
+    !t ? ''
+    : t === '取消回山' ? '請寫取消原因'
+    : t === '同車申請-親眷' ? '請填想同車的家人姓名，例：與王小芳（女兒）同車'
+    : t === '同車申請-非親眷' ? '請填想同車的對象姓名與原因'
+    : t === '轉移到其他梯次、車次' ? '請說明想轉移的梯次或車次（可不填，由幹部安排）'
+    : t === '更改來回交通方式(大車或自行)' ? '請說明想更改的去程／回程方式（可不填，由幹部安排）'
+    : '請說明需求';
+}
+
+function preConfirm(){
+  const type = $('req-type').value;
+  const detail = $('req-detail').value.trim();
+  if (!type) {
+    $('req-msg').textContent = '請選擇異動類型';
+    $('req-msg').className = 'form-msg err';
+    return;
+  }
+  if (NEED_REASON.includes(type) && !detail) {
+    $('req-msg').textContent = '此類型請填寫原因／說明';
+    $('req-msg').className = 'form-msg err';
+    return;
+  }
+  $('req-msg').textContent = '';
+  $('confirm-text').innerHTML =
+    `對象：<b>${S.reqTarget}</b>（${S.car} 車）<br>` +
+    `異動類型：<b>${type}</b><br>` +
+    `說明：${detail || '（未填）'}`;
+  $('req-form-box').classList.add('hidden');
+  $('confirm-box-wrap').classList.remove('hidden');
+}
+function backToEdit(){
+  $('req-form-box').classList.remove('hidden');
+  $('confirm-box-wrap').classList.add('hidden');
+  $('req-msg').textContent = '';
+}
+
+function sendRequest(){
+  $('req-msg').textContent = '送出中…'; $('req-msg').className = 'form-msg ok';
+  api({ action:'submit', car:S.car, applicant:S.name, target:S.reqTarget,
+        type:$('req-type').value, detail:$('req-detail').value.trim() })
+  .then(d => {
+    if (!d.ok) { $('req-msg').textContent = d.msg; $('req-msg').className = 'form-msg err'; return; }
+    closeReqSheet();
+    toast('✅ 已送出申請');
+    // 直接把後端回傳的這筆紀錄插入清單，不用再發一次myRequests
+    if (d.request) {
+      S.myReqs.unshift(d.request);
+      myReqMap[d.request.target] = (myReqMap[d.request.target] || 0) + 1;
+      renderRoster();
+      $('my-req-list').innerHTML = S.myReqs.map(r => reqCardHTML(r, false)).join('');
+    } else {
+      loadMyRequests();
+    }
+  })
+  .catch(() => { $('req-msg').textContent = '連線失敗，請稍後再試'; $('req-msg').className = 'form-msg err'; });
+}
+
+function loadMyRequests(){
+  api({ action:'myRequests', car:S.car }).then(d => {
+    if (!d.ok) return;
+    S.myReqs = d.list;
+    myReqMap = {};
+    d.list.filter(r => r.status === '待處理')
+          .forEach(r => { myReqMap[r.target] = (myReqMap[r.target] || 0) + 1; });
+    renderRoster();
+    $('my-req-list').innerHTML = d.list.length
+      ? d.list.map(r => reqCardHTML(r, false)).join('')
+      : '<div class="empty-note">尚無申請紀錄</div>';
+  });
+}
+
+/* ════ 申請卡片（共用） ════ */
+function stClass(s){ return s === '待處理' ? 'st-pend' : s === '已核准' ? 'st-ok' : 'st-rej'; }
+function stBadge(s){
+  const c = s === '待處理' ? 'badge-pend' : s === '已核准' ? 'badge-ok' : 'badge-rej';
+  return `<span class="badge ${c}">${s}</span>`;
+}
+function reqCardHTML(r, admin){
+  return `<div class="req-card ${stClass(r.status)}">
+    <div class="req-head">
+      <div class="req-name">${r.target}</div>
+      <div class="req-car">${r.car} 車</div>
+      <div class="req-badge">${stBadge(r.status)}</div>
+    </div>
+    <div class="req-body">
+      <b>${r.type}</b>
+      ${r.detail ? '<br>說明：' + r.detail : ''}
+      <div class="req-meta">申請人：${r.applicant}　·　${r.time}${r.doneTime ? '　·　處理 ' + r.doneTime : ''}</div>
+      ${r.adminNote ? `<div class="req-note">💬 ${r.adminNote}</div>` : ''}
+    </div>
+    ${admin && r.status === '待處理' ? adminOpsHTML(r) : ''}
+  </div>`;
+}
+
+/* ════ 管理者 ════ */
+function setAdminFilter(f){
+  S.adminFilter = f;
+  $('afilter-pend').classList.toggle('active', f === 'pend');
+  $('afilter-all').classList.toggle('active', f === 'all');
+  renderAdmin();
+}
+
+function loadAdmin(){
+  $('admin-list').innerHTML = '<div class="empty-note">載入中…</div>';
+  api({ action:'allRequests', code:S.adminCode }).then(d => {
+    if (!d.ok) {
+      $('admin-list').innerHTML = `<div class="empty-note">❌ ${d.msg}<br><small style="color:#999">code="${S.adminCode}" action=allRequests</small></div>`;
+      return;
+    }
+    if (!d.list || d.list.length === 0) {
+      $('admin-list').innerHTML = '<div class="empty-note">目前沒有資料 🙏</div>';
+      return;
+    }
+    S.allReqs = d.list;
+    renderAdmin();
+  }).catch(err => {
+    $('admin-list').innerHTML = `<div class="empty-note">連線失敗：${err.message}</div>`;
+  });
+}
+
+function renderAdmin(){
+  let list = S.allReqs;
+  if (S.adminFilter === 'pend') list = list.filter(r => r.status === '待處理');
+  $('admin-list').innerHTML = list.length
+    ? list.map(r => reqCardHTML(r, true)).join('')
+    : '<div class="empty-note">目前沒有資料 🙏</div>';
+}
+
+function adminOpsHTML(r){
+  const defType = TYPE_OPTIONS.includes(r.type) ? r.type : TYPE_OPTIONS[0];
+  const typeOpts = TYPE_OPTIONS.map(t =>
+    `<option value="${t}" ${t === defType ? 'selected' : ''}>${t}</option>`).join('');
+  const carOpts = S.cars.map(c =>
+    `<option value="${c}" ${c === r.car ? 'selected' : ''}>${c}</option>`).join('');
+  const legOpts = ['自行', ...S.cars].map(c => `<option value="${c}">${c}</option>`).join('');
+  return `<div class="ops" id="ops-${r.id}" data-car="${r.car}">
+    <label>處理方式（核准後依此執行）</label>
+    <select class="ex-mode" onchange="onExecMode('${r.id}')">${typeOpts}</select>
+
+    <div class="ex-carbox ${SINGLE_CAR_TYPES.includes(defType) ? '' : 'hidden'}">
+      <label>目標車號（去回都改成此車）</label>
+      <select class="ex-car">${carOpts}</select>
+    </div>
+
+    <div class="ex-legbox ${LEG_TYPES.includes(defType) ? '' : 'hidden'}">
+      <label>去程方式</label>
+      <select class="ex-go">${legOpts}</select>
+      <label>回程方式</label>
+      <select class="ex-back">${legOpts}</select>
+    </div>
+
+    <label>管理備註（選填，回覆給領隊）</label>
+    <input type="text" class="ex-note" placeholder="例：已調整，請轉知本人">
+    <div class="flex-gap mt-3">
+      <button class="btn btn-green" style="flex:1.5" onclick="doProcess('${r.id}','approve')">✅ 核准並執行</button>
+      <button class="btn btn-red" onclick="doProcess('${r.id}','reject')">退回</button>
+    </div>
+    <div class="ops-msg"></div>
+  </div>`;
+}
+
+function onExecMode(id){
+  const box = $('ops-' + id);
+  const m = box.querySelector('.ex-mode').value;
+  box.querySelector('.ex-carbox').classList.toggle('hidden', !SINGLE_CAR_TYPES.includes(m));
+  box.querySelector('.ex-legbox').classList.toggle('hidden', !LEG_TYPES.includes(m));
+}
+
+// 依審核時選擇的處理方式，組出送給後端的執行參數
+function buildExec(mode, curCar, box){
+  if (mode === '取消回山') return { exec:'delete' };
+
+  if (LEG_TYPES.includes(mode)) {
+    const go = box.querySelector('.ex-go').value;
+    const back = box.querySelector('.ex-back').value;
+    if (go === '自行' && back === '自行') return { exec:'toself' };
+    const targetCar = go !== '自行' ? go : back;
+    return targetCar === curCar
+      ? { exec:'update', go, back }
+      : { exec:'move', targetCar, go, back };
+  }
+
+  if (SINGLE_CAR_TYPES.includes(mode)) {
+    const selCar = box.querySelector('.ex-car').value;
+    return selCar === curCar
+      ? { exec:'update', go:selCar, back:selCar }
+      : { exec:'move', targetCar:selCar, go:selCar, back:selCar };
+  }
+
+  return { exec:'none' };
+}
+
+function doProcess(id, decision){
+  const box = $('ops-' + id);
+  let ex = { exec:'none' };
+  if (decision === 'approve') {
+    ex = buildExec(box.querySelector('.ex-mode').value, box.dataset.car, box);
+  }
+  const msgEl = box.querySelector('.ops-msg');
+  msgEl.textContent = '處理中…'; msgEl.className = 'ops-msg ok';
+  box.querySelectorAll('button').forEach(b => b.disabled = true);
+  api({ action:'process', code:S.adminCode, id, decision,
+        exec: ex.exec, go: ex.go || '', back: ex.back || '',
+        targetCar: ex.targetCar || '',
+        note: box.querySelector('.ex-note').value.trim() })
+  .then(d => {
+    msgEl.textContent = d.msg;
+    msgEl.className = 'ops-msg ' + (d.ok ? 'ok' : 'err');
+    if (d.ok) { toast(decision === 'approve' ? '✅ ' + d.msg : '已退回'); setTimeout(loadAdmin, 900); }
+    else box.querySelectorAll('button').forEach(b => b.disabled = false);
+  })
+  .catch(() => {
+    msgEl.textContent = '連線失敗'; msgEl.className = 'ops-msg err';
+    box.querySelectorAll('button').forEach(b => b.disabled = false);
+  });
+}
+
+function clearAllRequests(){
+  if (!confirm('確定要清除畫面上所有異動紀錄嗎？\n（此操作只清除本頁顯示，不影響試算表中的資料）')) return;
+  if (!confirm('⚠️ 再次確認：清除後需重新整理頁面才能再次載入。\n確定清除？')) return;
+  S.allReqs = [];
+  renderAdmin();
+  toast('🗑 已清除所有異動紀錄顯示');
+}
+</script>
+</body>
+</html>
